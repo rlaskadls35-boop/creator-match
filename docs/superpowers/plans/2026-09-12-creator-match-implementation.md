@@ -1,5 +1,7 @@
 # Creator Match 구현 계획
 
+> **제출본 안내:** 초기 구현 작업을 위한 과거 계획입니다. 이후 사용자 검토로 달라진 최종 동작과 검증 방법은 [README](../../../README.md), [PRD](../../../PRD.md), [flowchart](../../../flowchart.md)에 정리되어 있습니다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 설계 문서(D1~D30)대로, 광고주가 예산·카테고리·규모를 입력하면 크리에이터 200명 CSV에서 후보를 매칭 점수 순으로 근거와 함께 보여주고, 운영자가 비중을 조절할 수 있는 정적 웹 프로토타입을 만들어 GitHub Pages에 배포한다.

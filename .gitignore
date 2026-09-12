@@ -12,3 +12,9 @@ coverage/
 
 # superpowers SDD scratch (ledger, briefs, review packages)
 .superpowers/
+
+# Local tooling and confidential recruiting source material
+.codex/
+.claude/
+/모비데이즈 P&A 사전 과제 안내md
+/모비데이즈 이메일.png
