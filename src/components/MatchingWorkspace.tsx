@@ -3,11 +3,15 @@ import type { DatasetStats, ScoredCreator, Weights } from '../domain/types';
 import { rankCreators } from '../domain/scoring';
 import { filterCandidates, sortCandidates, applyResultFilters, DEFAULT_SORT, DEFAULT_FILTERS, SORT_DEFAULT_DIRECTION } from '../domain/recommend';
 import type { SearchInput, SortKey, SortState, ResultFilters } from '../domain/recommend';
+import { diagnoseZeroResult, buildRelaxations, FEW_RESULTS_THRESHOLD } from '../domain/recommend';
 import { EMPTY_FORM, toSearchInput } from '../domain/searchForm';
 import type { SearchFormState } from '../domain/searchForm';
+import { fromSearchInput } from '../domain/searchForm';
 import { SearchPanel } from './SearchPanel';
 import { ResultsToolbar } from './ResultsToolbar';
 import { ResultsTable } from './ResultsTable';
+import { ZeroResults } from './ZeroResults';
+import { RelaxationList } from './RelaxationList';
 
 interface Props {
   creators: ScoredCreator[];
@@ -26,6 +30,12 @@ export function MatchingWorkspace({ creators, stats, weights }: Props) {
 
   const candidates = useMemo(() => (query ? filterCandidates(ranked, query) : []), [ranked, query]);
   const visible = useMemo(() => sortCandidates(applyResultFilters(candidates, filters), sort), [candidates, filters, sort]);
+  // 0명 판정은 결과 필터(플랫폼·이력) 적용 전 인원으로 (설계 §5.1)
+  const zeroInfo = useMemo(() => (query && candidates.length === 0 ? diagnoseZeroResult(ranked, query) : null), [ranked, query, candidates]);
+  const fewRelaxations = useMemo(
+    () => (query && candidates.length > 0 && candidates.length < FEW_RESULTS_THRESHOLD ? buildRelaxations(ranked, query) : null),
+    [ranked, query, candidates],
+  );
 
   const runSearch = (input: SearchInput) => {
     setQuery(input);
@@ -37,6 +47,10 @@ export function MatchingWorkspace({ creators, stats, weights }: Props) {
     const input = toSearchInput(form);
     if (input) runSearch(input);
   };
+  const handleRelax = (next: SearchInput) => {
+    setForm(fromSearchInput(next)); // 폼에도 바뀐 값 반영 (설계 §6.2)
+    runSearch(next);
+  };
   const handleSort = (key: SortKey) =>
     setSort((s) => (s.key === key ? { key, direction: s.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: SORT_DEFAULT_DIRECTION[key] }));
   const toggleExpand = (id: string) => setExpandedId((cur) => (cur === id ? null : id));
@@ -47,8 +61,8 @@ export function MatchingWorkspace({ creators, stats, weights }: Props) {
       <section className="results">
         {query === null ? (
           <p className="results__empty">조건을 입력하고 크리에이터 찾기를 누르세요</p>
-        ) : candidates.length === 0 ? (
-          <p className="results__empty">조건에 맞는 크리에이터가 없습니다</p>
+        ) : zeroInfo ? (
+          <ZeroResults info={zeroInfo} onRelax={handleRelax} />
         ) : (
           <>
             <ResultsToolbar count={visible.length} filters={filters} onChange={setFilters} />
@@ -56,6 +70,9 @@ export function MatchingWorkspace({ creators, stats, weights }: Props) {
               <p className="results__empty">선택한 필터에 맞는 크리에이터가 없습니다. 필터를 풀어 보세요.</p>
             ) : (
               <ResultsTable rows={visible} sort={sort} onSortChange={handleSort} stats={stats} expandedId={expandedId} onToggleExpand={toggleExpand} />
+            )}
+            {fewRelaxations && (
+              <RelaxationList compact title="후보가 적습니다. 조건을 넓히면 더 볼 수 있습니다." items={fewRelaxations} onRelax={handleRelax} />
             )}
           </>
         )}
