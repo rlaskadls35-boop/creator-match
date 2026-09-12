@@ -12,7 +12,7 @@ import type { Weights } from '../domain/types';
 export function AdminPage({ data }: { data: LoadedData }) {
   const loggedIn = isAdminLoggedIn();
   const [draft, setDraft] = useState<Weights>(() => loadWeights());
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
   // 저장 전이라도 이 화면의 결과에는 실시간 반영. 합이 100이 아니면 비율로 환산 (L21)
   const previewWeights = useMemo(() => normalizeWeights(draft), [draft]);
 
@@ -22,7 +22,11 @@ export function AdminPage({ data }: { data: LoadedData }) {
   if (!loggedIn) return null;
 
   const handleSave = () =>
-    setMessage(saveWeights(draft) ? '저장했습니다. 광고주 화면에 적용됩니다.' : '저장에 실패했습니다. 브라우저 저장소를 사용할 수 없습니다.');
+    setMessage(
+      saveWeights(draft)
+        ? { kind: 'success', text: '저장했습니다. 광고주 화면에 적용됩니다.' }
+        : { kind: 'error', text: '저장에 실패했습니다. 브라우저 저장소를 사용할 수 없습니다.' },
+    );
   const handleReset = () => {
     setDraft({ ...DEFAULT_WEIGHTS });
     setMessage(null);

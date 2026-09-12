@@ -7,7 +7,7 @@ interface Props {
   onChange: (w: Weights) => void;
   onSave: () => void;
   onReset: () => void;
-  message: string | null;
+  message: { kind: 'success' | 'error'; text: string } | null;
 }
 
 /** 비중 조절 카드 (설계 §6.4 2, D23) */
@@ -39,7 +39,11 @@ export function WeightsCard({ draft, onChange, onSave, onReset, message }: Props
       <div className="weights__actions">
         <button type="button" className="btn btn--primary" disabled={!ok} onClick={onSave}>저장</button>
         <button type="button" className="btn" onClick={onReset}>기본값으로 되돌리기</button>
-        {message && <span className="weights__message" role="status">{message}</span>}
+        {message && (
+          <span className={`weights__message weights__message--${message.kind}`} role={message.kind === 'error' ? 'alert' : 'status'}>
+            {message.text}
+          </span>
+        )}
       </div>
     </section>
   );
