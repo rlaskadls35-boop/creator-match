@@ -108,7 +108,7 @@ button { font: inherit; }
 .check input { width: 16px; height: 16px; accent-color: var(--primary); }
 
 /* ── 결과 표 ── */
-.table-wrap { overflow-x: auto; background: var(--card); border-radius: var(--radius-card); box-shadow: var(--shadow); }
+.table-wrap { background: var(--card); border-radius: var(--radius-card); box-shadow: var(--shadow); }
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .table th { text-align: left; font-size: 13px; color: var(--text-muted); font-weight: 500; padding: 14px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
 .table td { padding: 14px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; transition: background .15s ease; }
@@ -121,6 +121,9 @@ button { font: inherit; }
 /* 표 머리글·첫 행의 ⓘ 버블은 위로 열리면 .table-wrap에 잘리므로 아래로 연다 (최종 리뷰 지적) */
 .table thead .tip__bubble,
 .table tbody tr:first-child .tip__bubble { top: calc(100% + 8px); bottom: auto; }
+/* .table-wrap이 더 이상 잘라내지 않으므로 마지막 행의 hover/강조 배경이 둥근 모서리를 넘지 않도록 마감 (최종 재검토 지적) */
+.table tbody tr:last-child td:first-child { border-bottom-left-radius: var(--radius-card); }
+.table tbody tr:last-child td:last-child { border-bottom-right-radius: var(--radius-card); }
 .sort-btn { border: 0; background: transparent; padding: 0; cursor: pointer; color: inherit; font: inherit; display: inline-flex; align-items: center; gap: 4px; transition: color .15s ease; }
 .sort-btn:hover { color: var(--primary); }
 .sort-btn__arrow { font-size: 11px; opacity: .7; }
@@ -207,6 +210,7 @@ html, body { overflow-x: hidden; }
   .main, .header, .footer { padding-left: 16px; padding-right: 16px; }
   .intro { font-size: 18px; }
   .tiers { grid-template-columns: 1fr; }
+  .table-wrap { overflow-x: auto; }
   .table { min-width: 860px; }
   .weights__grid { grid-template-columns: 1fr 1fr; }
   .bars__item { grid-template-columns: 110px 1fr 36px; }
