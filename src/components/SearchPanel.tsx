@@ -130,8 +130,6 @@ export function SearchPanel({ value, onChange, onSubmit }: Props) {
                 <button key={t} type="button" role="radio" aria-checked={on} className={`tier-card${on ? ' is-on' : ''}`} onClick={() => pickTier(t)}>
                   <span className="tier-card__name">{t}</span>
                   <span className="tier-card__range">{info.range}</span>
-                  <span className="tier-card__trait">{info.trait}</span>
-                  <span className="tier-card__rate">{info.rateRange}</span>
                 </button>
               );
             })}

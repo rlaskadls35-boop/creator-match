@@ -30,3 +30,17 @@ describe('SearchPanel 예산 입력 커서 (Task 12 리뷰 수정 #1)', () => {
     expect(input.selectionStart).toBe(3);
   });
 });
+
+describe('SearchPanel 크리에이터 규모 카드', () => {
+  it('규모명과 팔로워 범위만 표시한다', () => {
+    render(<Harness />);
+
+    expect(screen.getByText('1만 미만')).toBeInTheDocument();
+    expect(screen.getByText('1만~10만')).toBeInTheDocument();
+    expect(screen.getByText('10만 이상')).toBeInTheDocument();
+    expect(screen.queryByText('팬과 가까운 채널')).not.toBeInTheDocument();
+    expect(screen.queryByText('반응과 도달의 균형')).not.toBeInTheDocument();
+    expect(screen.queryByText('넓은 도달')).not.toBeInTheDocument();
+    expect(screen.queryByText(/단가/)).not.toBeInTheDocument();
+  });
+});
