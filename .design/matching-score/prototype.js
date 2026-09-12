@@ -39,10 +39,11 @@ function updateSearchState() {
   $('#search-state').textContent = !draftQuery.categories.length?'카테고리를 한 개 이상 선택해주세요.':JSON.stringify(draftQuery)!==JSON.stringify(query)?'조건을 바꿨어요. 검색하면 결과에 반영됩니다.':'과거 평균 단가가 예산 이내인 후보를 찾아요.';
 }
 function renderWeights() {
-  $('#weights').innerHTML = KEYS.map(k=>`<div class="weight-row" style="--metric:var(--${k})"><label class="metric-label" for="weight-${k}"><span class="dot"></span>${LABELS[k]}</label><input class="weight-range" data-range="${k}" type="range" min="0" max="100" step="1" value="${draftWeights[k]}" aria-label="${LABELS[k]} 비중 슬라이더"/><div class="weight-number"><input id="weight-${k}" data-weight="${k}" type="number" min="0" max="100" step="1" value="${draftWeights[k]}" aria-label="${LABELS[k]} 비중"/><span>%</span></div></div>`).join('');
+  $('#weights').innerHTML = KEYS.map(k=>`<div class="weight-row" style="--metric:var(--${k})"><label class="metric-label" for="weight-${k}"><span class="dot"></span>${LABELS[k]}</label><input class="weight-range" style="--value:${draftWeights[k]}%" data-range="${k}" type="range" min="0" max="100" step="1" value="${draftWeights[k]}" aria-label="${LABELS[k]} 비중 슬라이더"/><div class="weight-number"><input id="weight-${k}" data-weight="${k}" type="number" min="0" max="100" step="1" value="${draftWeights[k]}" aria-label="${LABELS[k]} 비중"/><span>%</span></div></div>`).join('');
   updateWeightState();
 }
 function updateWeightState() {
+  KEYS.forEach(k=>$(`[data-range="${k}"]`).style.setProperty('--value',`${draftWeights[k]??0}%`));
   const sum = KEYS.reduce((s,k)=>s+(draftWeights[k]??0),0);
   const inRange = KEYS.every(k=>Number.isInteger(draftWeights[k])&&draftWeights[k]>=0&&draftWeights[k]<=100);
   const valid = sum===100 && inRange;
@@ -58,7 +59,7 @@ function metricFormula(c,k) {
   const pool=ALL.filter(o=>(k==='rating'||o.tier===c.tier)&&Number.isFinite(o[VALUES[k]])&&o[VALUES[k]]!==null);
   const ties=pool.filter(o=>o.id!==c.id&&o[VALUES[k]]===c[VALUES[k]]).length;
   const better=m.rank-1;
-  const cost=k==='costPerView'?`<p class="cost-formula">조회당 비용 = ${int(c.rate)}원 ÷ ${int(c.avgViewCount)}회 = ${c.costPerView.toFixed(3)}…원<br/>표에는 ${int(c.costPerView)}원으로 표시하고, 순위 비교에는 반올림 전 값을 사용해요.</p>`:'';
+  const cost=k==='costPerView'?`<p class="cost-formula">조회당 비용 = ${int(c.rate)}원 ÷ ${int(c.avgViewCount)}회 ≈ ${c.costPerView.toFixed(3)}원<br/>표에는 ${int(c.costPerView)}원으로 표시하고, 순위 비교에는 반올림 전 값을 사용해요.</p>`:'';
   return `${cost}<p>항목 점수 = 100 − [(더 ${k==='costPerView'?'낮은':'높은'} 수치의 인원 + 동점자 ÷ 2) ÷ (비교 인원 − 1) × 100]</p><p class="numeric-formula">${m.groupSize<=1?'비교 대상이 1명이면 중간값인 50점을 부여해요.':`100 − [(${better} + ${ties} ÷ 2) ÷ (${m.groupSize} − 1) × 100] ≈ <strong>${m.score.toFixed(1)}점</strong>`}</p><p>동점자는 본인을 제외한 ${ties}명 · 항목 점수는 소수 첫째 자리로 반올림</p>`;
 }
 function breakdown(c) {
@@ -107,6 +108,7 @@ document.addEventListener('click',e=>{
   if(target.dataset.platform){draftQuery.platform=target.dataset.platform;renderFilters();}
   if(target.dataset.tier){draftQuery.tier=target.dataset.tier;renderFilters();}
   if(target.dataset.category){const c=target.dataset.category;draftQuery.categories=draftQuery.categories.includes(c)?draftQuery.categories.filter(x=>x!==c):[...draftQuery.categories,c];renderFilters();}
+  for(const name of ['platform','tier','category']){if(target.dataset[name])document.querySelector(`[data-${name}="${target.dataset[name]}"]`)?.focus({preventScroll:true});}
   if(target.dataset.expand){const id=target.dataset.expand;const opener=target.classList.contains('score-button')?'.score-button':'.detail-button';expanded=expanded===id?null:id;if(expanded&&!Array.from(openedMetrics).some(s=>s.startsWith(`${id}:`)))openedMetrics.add(`${id}:engagement`);renderResults();document.querySelector(`${opener}[data-expand="${id}"]`)?.focus({preventScroll:true});}
   if(target.dataset.rules){const el=$(`#rules-${target.dataset.rules}`);el.hidden=!el.hidden;target.setAttribute('aria-expanded',String(!el.hidden));}
   if(target.id==='reset'||target.hasAttribute('data-reset'))reset();
