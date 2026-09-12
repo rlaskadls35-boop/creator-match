@@ -163,3 +163,30 @@ button { font: inherit; }
 .near__title { margin: 8px 0 4px; font-size: 16px; }
 .near__desc { margin: 0 0 12px; font-size: 13.5px; color: var(--text-muted); }
 .chip--change { background: var(--primary-soft); color: var(--primary-deep); border-color: transparent; font-weight: 500; white-space: nowrap; }
+
+/* ── 로그인 ── */
+.login { display: flex; flex-direction: column; }
+.login__title { margin: 0 0 6px; font-size: 22px; }
+.login__notice { margin: 0 0 20px; font-size: 13.5px; color: var(--warning-fg); background: var(--warning-bg); padding: 8px 12px; border-radius: 10px; }
+.login__label { margin-top: 14px; }
+.login__submit { margin-top: 20px; padding: 12px; }
+.login__hint { margin: 14px 0 0; font-size: 13px; color: var(--text-muted); text-align: center; }
+.login__back { margin-top: 8px; font-size: 13px; text-align: center; }
+
+/* ── 운영자 비중 카드 ── */
+.weights { margin-bottom: 20px; }
+.weights__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.weights__title { margin: 0 0 4px; font-size: 20px; }
+.weights__desc { margin: 0; font-size: 13.5px; color: var(--text-muted); }
+.weights__sum { font-weight: 700; padding: 8px 14px; border-radius: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.weights__sum.is-ok { background: var(--positive-bg); color: var(--positive-fg); }
+.weights__sum.is-bad { background: #FEE2E2; color: var(--destructive); }
+.weights__sum-help { font-size: 12px; font-weight: 500; }
+.weights__grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin: 20px 0 12px; }
+.slider { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
+.slider input[type="range"] { width: 100%; accent-color: var(--primary); }
+.slider__label { font-weight: 500; }
+.slider__value { font-weight: 700; font-size: 18px; color: var(--primary-deep); }
+.weights__warning { margin: 0 0 14px; font-size: 13px; color: var(--warning-fg); }
+.weights__actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.weights__message { font-size: 13.5px; color: var(--positive-fg); }
