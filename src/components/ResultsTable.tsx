@@ -1,22 +1,19 @@
 import { Fragment } from 'react';
-import type { DatasetStats, RankedCreator, Weights } from '../domain/types';
+import type { RankedCreator, Weights } from '../domain/types';
 import { SORT_LABEL } from '../domain/recommend';
 import type { SortKey, SortState } from '../domain/recommend';
 import { formatCostPerView, formatInt, formatPercent, formatRating } from '../domain/format';
 import { Tooltip } from './Tooltip';
-import { ExplainRow } from './ExplainRow';
 import { ScoreBreakdown } from './ScoreBreakdown';
 
 interface Props {
   rows: RankedCreator[];
   sort: SortState;
   onSortChange: (key: SortKey) => void;
-  stats: DatasetStats;
   expandedId: string | null;
   onToggleExpand: (id: string) => void;
-  variant?: 'advertiser' | 'admin';
-  /** 운영자 화면에서 계산 내역에 쓰는 현재 미리보기 비중 */
-  weights?: Weights;
+  /** 현재 결과의 매칭 점수 계산에 사용한 비중 */
+  weights: Weights;
   /** 저장된 비중 기준 순위 (매칭 점수 정렬일 때만) */
   priorRankById?: Map<string, number> | null;
 }
@@ -32,7 +29,7 @@ const SORTABLE: { key: SortKey; label: string; heading?: string; tooltip?: strin
   { key: 'costPerView', label: '1조회당 비용', heading: '1조회당\n비용', tooltip: '과거 1건 평균 단가 ÷ 평균 조회수로 계산한 참고값입니다. 낮을수록 비용 효율이 높으며 매칭 점수에 반영됩니다. 실제 광고 집행 결과와는 다를 수 있습니다.' },
 ];
 
-/** 순위·크리에이터·플랫폼·카테고리 열 + 정렬 가능 열 + 추천 이유 열 (설계 리뷰 지적: 매직 넘버 제거) */
+/** 순위·크리에이터·플랫폼·카테고리 열 + 정렬 가능 열 + 점수 설명 열 */
 const COLUMN_COUNT = 4 + SORTABLE.length + 1;
 
 /** 매칭 점수 뱃지 색 단계. 20점 단위로 80점 이상이 초록, 20점 미만이 빨강 */
@@ -46,13 +43,12 @@ export function scoreBand(score: number): 1 | 2 | 3 | 4 | 5 {
 
 export function ResultsTable({
   rows, sort, onSortChange, expandedId, onToggleExpand,
-  variant = 'advertiser', weights, priorRankById,
+  weights, priorRankById,
 }: Props) {
-  const admin = variant === 'admin';
   const rankHeader = sort.key === 'match' ? '순위' : `순위 (${SORT_LABEL[sort.key]} 기준)`;
   return (
     <div className="table-wrap">
-      <table aria-label="캠페인 이력이 있는 후보" className={`table table--ranked${admin ? ' table--admin' : ''}`}>
+      <table aria-label="캠페인 이력이 있는 후보" className="table table--ranked">
         <thead>
           <tr>
             <th scope="col" aria-label={rankHeader} title={rankHeader}>순위</th>
@@ -74,7 +70,7 @@ export function ResultsTable({
                 </th>
               );
             })}
-            <th scope="col"><span className="th__label">{admin ? '점수\n설명' : '추천 이유\n보기'}</span></th>
+            <th scope="col"><span className="th__label">{'점수\n설명'}</span></th>
           </tr>
         </thead>
         <tbody>
@@ -110,21 +106,19 @@ export function ResultsTable({
                   <td className="table__action">
                     <button
                       type="button"
-                      className={`expand-btn${admin ? ' expand-btn--text' : ''}`}
+                      className="expand-btn expand-btn--text"
                       aria-expanded={open}
-                      aria-label={`${c.name} ${admin ? '계산 내역' : '추천 이유'} ${open ? '접기' : '보기'}`}
+                      aria-label={`${c.name} 계산 내역 ${open ? '접기' : '보기'}`}
                       onClick={() => onToggleExpand(c.id)}
                     >
-                      {admin ? (open ? '접기' : '계산 보기') : (open ? '▾' : '▸')}
+                      {open ? '접기' : '계산 보기'}
                     </button>
                   </td>
                 </tr>
                 {open && (
                   <tr className="explain-row">
                     <td colSpan={COLUMN_COUNT}>
-                      {admin && weights
-                        ? <ScoreBreakdown creator={c} weights={weights} />
-                        : <ExplainRow creator={c} />}
+                      <ScoreBreakdown creator={c} weights={weights} />
                     </td>
                   </tr>
                 )}

@@ -33,7 +33,7 @@ function formatPoints(value: number): string {
   return value.toFixed(3).replace(/(\.\d{2})0$/, '$1');
 }
 
-/** 운영자 화면 펼침: 매칭 점수가 어떻게 나온 값인지 항목별로 보여 준다 (L23) */
+/** 두 화면에서 매칭 점수가 어떻게 나온 값인지 항목별로 보여 준다. */
 export function ScoreBreakdown({ creator, weights }: Props) {
   const contributions = METRIC_KEYS.map((k) => formatPoints((creator.metrics[k].score * weights[k]) / 100));
   return (

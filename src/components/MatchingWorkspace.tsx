@@ -19,7 +19,6 @@ interface Props {
   creators: ScoredCreator[];
   stats: DatasetStats;
   weights: Weights;
-  variant?: 'advertiser' | 'admin';
   /** 운영자 화면에서 저장된 비중 — 미리보기와 비교해 점수·순위 변화를 보여 준다 */
   savedWeights?: Weights;
   /** 검색 조건과 결과 사이에 배치할 운영자 전용 설정 UI */
@@ -27,8 +26,7 @@ interface Props {
 }
 
 /** 광고주 화면과 운영자 화면이 공유하는 "입력 패널 + 결과" 블록. 비중만 다르게 받는다 */
-export function MatchingWorkspace({ creators, stats, weights, variant = 'advertiser', savedWeights, afterSearchPanel }: Props) {
-  const admin = variant === 'admin';
+export function MatchingWorkspace({ creators, stats, weights, savedWeights, afterSearchPanel }: Props) {
   const ranked = useMemo(() => rankCreators(creators, weights), [creators, weights]);
   const [form, setForm] = useState<SearchFormState>(EMPTY_FORM);
   const [query, setQuery] = useState<SearchInput | null>(null);
@@ -52,9 +50,9 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
 
   // 저장된 비중으로 계산한 점수·순위 (운영자 화면 비교용, L23)
   const savedScoreById = useMemo(() => {
-    if (!admin || !savedWeights) return null;
+    if (!savedWeights) return null;
     return new Map(ranked.map((c) => [c.id, matchScore(c, savedWeights)]));
-  }, [admin, savedWeights, ranked]);
+  }, [savedWeights, ranked]);
   // 순위 비교는 매칭 점수 내림차순으로 볼 때만 뜻이 있다
   const priorRankById = useMemo(() => {
     if (!savedScoreById || sort.key !== 'match' || sort.direction !== 'desc') return null;
@@ -112,10 +110,8 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
                 rows={visible}
                 sort={sort}
                 onSortChange={handleSort}
-                stats={stats}
                 expandedId={expandedId}
                 onToggleExpand={toggleExpand}
-                variant={variant}
                 weights={weights}
                 priorRankById={priorRankById}
               />

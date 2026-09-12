@@ -11,13 +11,14 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 describe('광고주 화면 스모크 (설계 §8)', () => {
-  it('조건을 입력해 검색하면 결과 표가 보이고 추천 이유를 펼칠 수 있다', async () => {
+  it('비중 조절 UI 없이 검색하고 운영자와 같은 점수 계산 내역을 펼칠 수 있다', async () => {
     window.location.hash = '#/';
     localStorage.clear();
     render(<App />);
     const user = userEvent.setup();
 
     expect(await screen.findByText('조건을 입력하고 크리에이터 찾기를 누르세요')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: '매칭 점수 비중 조절' })).not.toBeInTheDocument();
 
     await user.type(screen.getByLabelText('크리에이터 1명당 섭외 예산'), '1500000');
     expect(screen.getByText('→ 150만 원')).toBeInTheDocument();
@@ -31,10 +32,12 @@ describe('광고주 화면 스모크 (설계 §8)', () => {
     expect(rows[1]).toHaveTextContent('정은매거진77');
     expect(rows[1].querySelector('[data-label="매칭 점수"]')).toHaveTextContent('76'); // 75.61 → 76
 
-    await user.click(screen.getByRole('button', { name: '정은매거진77 추천 이유 보기' }));
-    expect(screen.getByText('왜 추천하나요?')).toBeInTheDocument();
-    expect(screen.queryByText('유의점: 참여율은 마이크로 중 하위권입니다 (6.5%)')).not.toBeInTheDocument();
-    expect(screen.getByText('마이크로 72명 중 공동 52등')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '정은매거진77 계산 내역 보기' }));
+    const breakdown = screen.getByLabelText('정은매거진77 매칭 점수 계산 내역');
+    expect(within(breakdown).getByRole('heading', { name: '매칭 점수 계산 내역' })).toBeInTheDocument();
+    expect(within(breakdown).getByText('× 40%')).toBeInTheDocument();
+    expect(within(breakdown).getByText('마이크로 72명 중 공동 52등')).toBeInTheDocument();
+    expect(within(breakdown).getByLabelText('항목 점수 산정식 설명')).toBeInTheDocument();
 
     // 광고주 평점으로 정렬하면 순위 열 제목이 바뀌고 표가 평점 내림차순으로 다시 그려진다
     await user.click(screen.getByRole('button', { name: /^광고주 평점/ }));

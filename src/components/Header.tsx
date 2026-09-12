@@ -16,11 +16,11 @@ export function Header({ variant, accountName, onLogout }: Props) {
           </svg>
         </a>
         <div>
-          <div className="header__title">{variant === 'admin' ? 'Creator Match 운영자 화면' : 'Creator Match'}</div>
-          {variant !== 'admin' && <div className="header__subtitle">광고주를 위한 크리에이터 추천</div>}
+          <div className="header__title">Creator Match</div>
+          {variant === 'login' && <div className="header__subtitle">광고주를 위한 크리에이터 추천</div>}
         </div>
       </div>
-      {variant === 'advertiser' && <a className="header__link" href="#/login">운영자 로그인</a>}
+      {variant === 'advertiser' && <a className="btn btn--ghost header__link" href="#/login">운영자 로그인</a>}
       {variant === 'admin' && (
         <div className="header__account">
           <span className="header__account-name">{accountName}</span>

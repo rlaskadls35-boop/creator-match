@@ -12,7 +12,6 @@ export function AdvertiserPage({ data }: { data: LoadedData }) {
     <div className="page">
       <Header variant="advertiser" />
       <main className="main">
-        <p className="intro">우리 브랜드에 맞는 크리에이터, 예산 안에서 찾아드립니다.</p>
         {data.ok ? (
           <MatchingWorkspace creators={data.creators} stats={data.stats} weights={weights} />
         ) : (

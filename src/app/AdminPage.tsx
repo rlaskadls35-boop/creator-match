@@ -57,7 +57,6 @@ export function AdminPage({ data }: { data: LoadedData }) {
       <main className="main">
         {data.ok ? (
           <MatchingWorkspace
-            variant="admin"
             creators={data.creators}
             stats={data.stats}
             weights={preview}
