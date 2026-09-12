@@ -23,11 +23,11 @@ describe('확인된 네 지표로만 매칭 점수 계산', () => {
 
   it('채널 지표는 전체 규모 집단, 평점·비용은 해당 정보가 있는 사람끼리 비교한다', () => {
     const m = byId('C0180').metrics;
-    expect(m.engagement.groupSize).toBe(129);
-    expect(m.engagement.score).toBe(59);
-    expect(m.views.score).toBe(53.1);
+    expect(m.engagement.groupSize).toBe(72);
+    expect(m.engagement.score).toBe(69);
+    expect(m.views.score).toBe(18.3);
     expect(m.rating.groupSize).toBe(173);
-    expect(m.costPerView.groupSize).toBe(115);
+    expect(m.costPerView.groupSize).toBe(61);
   });
 
   it('캠페인 건수만 바뀌어도 점수·순위는 바뀌지 않는다', () => {

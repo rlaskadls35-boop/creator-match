@@ -1,3 +1,4 @@
+import { databaseBytes } from '../test/sqliteFixture';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -5,7 +6,7 @@ import { AdminPage } from './AdminPage';
 import { loadDataset } from './dataset';
 import { SESSION_KEY } from './session';
 
-const data = loadDataset();
+const data = await loadDataset(databaseBytes);
 
 /** 제안서와 같은 조건: 1명당 50만 원 · 뷰티 · 나노 → 이력 후보 2명 */
 async function searchThree(user: ReturnType<typeof userEvent.setup>) {
@@ -14,6 +15,9 @@ async function searchThree(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('radio', { name: /나노/ }));
   await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
   expect(await screen.findByText('캠페인 이력이 있는 후보 2명')).toBeInTheDocument();
+  const firstRow = within(screen.getByRole('table', { name: '캠페인 이력이 있는 후보' })).getAllByRole('row')[1];
+  expect(firstRow).toHaveTextContent('하은챌린지104');
+  expect(firstRow.querySelector('[data-label="매칭 점수"]')).toHaveTextContent('39'); // 새 나노 집단에서 38.59점
 }
 
 async function openWeights(user: ReturnType<typeof userEvent.setup>) {

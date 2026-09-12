@@ -14,12 +14,12 @@ describe('후보 0명: 근접 후보만 보여 준다 (L25)', () => {
     expect(filterCandidates(ranked, Q)).toHaveLength(0);
   });
 
-  it('근접 후보 3명: 준그램40(예산), 하은챌린지104(규모), 하은리뷰121(규모)', () => {
+  it('근접 후보 3명: 준그램40(예산), 민준다이어리20(예산), 하은챌린지104(규모)', () => {
     const near = nearCandidates(ranked, Q);
     expect(near).toHaveLength(3);
-    expect(near.map((n) => n.creator.id)).toEqual(['C0040', 'C0104', 'C0121']);
+    expect(near.map((n) => n.creator.id)).toEqual(['C0040', 'C0020', 'C0104']);
     expect(near[0].change).toBe('예산을 658만 원 이상으로');
-    expect(near[1].change).toBe('규모를 나노로');
+    expect(near[1].change).toBe('예산을 301만 원 이상으로');
     expect(near[2].change).toBe('규모를 나노로');
   });
 
@@ -53,7 +53,7 @@ describe('buildRelaxations: 후보 1~2명일 때만 쓴다 (설계 §5.7 마지�
     const byId = Object.fromEntries(buildRelaxations(ranked, q).map((r) => [r.id, r]));
     expect(byId.budget.label).toBe('예산을 658만 원으로 올리면');
     expect(byId.budget.count).toBe(2);
-    expect(byId['tier-나노'].count).toBe(2);
+    expect(byId['tier-나노'].count).toBe(8);
     expect(byId['tier-나노'].enabled).toBe(true);
     expect(byId['tier-나노'].nextInput.tier).toBe('나노');
     expect(byId.category.nextInput.categories).toHaveLength(10);

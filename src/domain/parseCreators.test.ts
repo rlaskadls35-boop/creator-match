@@ -85,15 +85,15 @@ describe('parseCreators 실제 데이터', () => {
     expect(ds.stats.ratedCount).toBe(173);
   });
 
-  it('규모 구간 인원 44 / 129 / 27', () => {
+  it('규모 구간 인원 101 / 72 / 27', () => {
     const count = (t: string) => ds.creators.filter((c) => c.tier === t).length;
-    expect(count('나노')).toBe(44);
-    expect(count('마이크로')).toBe(129);
+    expect(count('나노')).toBe(101);
+    expect(count('마이크로')).toBe(72);
     expect(count('매크로')).toBe(27);
   });
 
   it('규모별 단가 통계는 참고값으로만 보관하고 신규 개인 값에 적용하지 않는다', () => {
-    expect(ds.stats.medianRateByTier).toEqual({ 나노: 365_000, 마이크로: 1_320_000, 매크로: 4_725_000 });
+    expect(ds.stats.medianRateByTier).toEqual({ 나노: 700_000, 마이크로: 1_320_000, 매크로: 4_725_000 });
     expect(ds.stats.ratingAverage).toBeCloseTo(4.42, 2);
     const fresh = ds.creators.find((c) => c.id === 'C0036')!; // 지수챌린지36, 마이크로, 이력 없음
     expect(fresh.rate).toBeNull();

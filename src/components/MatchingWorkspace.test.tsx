@@ -1,3 +1,4 @@
+import { databaseBytes } from '../test/sqliteFixture';
 import { describe, it, expect } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -7,7 +8,7 @@ import { DEFAULT_WEIGHTS } from '../domain/weights';
 
 describe('후보 0명 화면 (L25)', () => {
   it('진단 문단과 조건 완화 버튼 없이 근접 후보 표만 보여 준다', async () => {
-    const data = loadDataset();
+    const data = await loadDataset(databaseBytes);
     expect(data.ok).toBe(true);
     if (!data.ok) return;
 
@@ -34,7 +35,7 @@ describe('후보 0명 화면 (L25)', () => {
 
 describe('후보 1~2명일 때의 완화 버튼: 클릭 → 폼 반영 → 재검색 (최종 리뷰 지적 #7)', () => {
   it('예산 완화 버튼을 누르면 폼의 예산이 바뀌고 그 조건으로 다시 검색된다', async () => {
-    const data = loadDataset();
+    const data = await loadDataset(databaseBytes);
     expect(data.ok).toBe(true);
     if (!data.ok) return;
 
@@ -59,7 +60,7 @@ describe('후보 1~2명일 때의 완화 버튼: 클릭 → 폼 반영 → 재�
 
 describe('기존 후보와 신규 후보 분리', () => {
   it('두 표를 분리하고 신규 후보에는 평점·단가·매칭 점수를 만들지 않는다', async () => {
-    const data = loadDataset();
+    const data = await loadDataset(databaseBytes);
     if (!data.ok) throw new Error(data.message);
     render(<MatchingWorkspace creators={data.creators} stats={data.stats} weights={DEFAULT_WEIGHTS} />);
     const user = userEvent.setup();
@@ -81,14 +82,14 @@ describe('기존 후보와 신규 후보 분리', () => {
     expect(within(fresh).getAllByRole('row')[1]).toHaveTextContent('지수챌린지36');
     await user.click(screen.getByRole('radio', { name: '유튜브' }));
     await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
-    expect(within(experienced).getAllByRole('row')).toHaveLength(7);
+    expect(within(experienced).getAllByRole('row')).toHaveLength(4);
     expect(within(fresh).getAllByRole('row')).toHaveLength(2);
     await user.click(screen.getByRole('checkbox', { name: '캠페인 이력 있는 크리에이터만' }));
     expect(screen.queryByRole('table', { name: '추가 확인이 필요한 신규 후보' })).not.toBeInTheDocument();
   });
 
   it('예산 내 기존 후보가 없어도 신규 후보는 예산 미확인 안내와 함께 표시된다', async () => {
-    const data = loadDataset();
+    const data = await loadDataset(databaseBytes);
     if (!data.ok) throw new Error(data.message);
     render(<MatchingWorkspace creators={data.creators} stats={data.stats} weights={DEFAULT_WEIGHTS} />);
     const user = userEvent.setup();

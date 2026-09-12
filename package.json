@@ -8,13 +8,19 @@
     "build": "tsc -p tsconfig.json && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:build": "tsx scripts/build-database.ts",
+    "predev": "npm run db:build",
+    "prebuild": "npm run db:build",
+    "pretest": "npm run db:build",
+    "pretest:watch": "npm run db:build"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "papaparse": "^5.5.3",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "sql.js": "^1.14.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.0",
@@ -23,8 +29,10 @@
     "@types/papaparse": "^5.3.16",
     "@types/react": "^18.3.20",
     "@types/react-dom": "^18.3.7",
+    "@types/sql.js": "^1.4.11",
     "@vitejs/plugin-react": "^6.0.0",
     "jsdom": "^30.0.0",
+    "tsx": "^4.23.13",
     "typescript": "^5.9.0",
     "vite": "^8.0.0",
     "vitest": "^5.0.0"
