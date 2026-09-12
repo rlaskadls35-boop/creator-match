@@ -7,7 +7,7 @@ export function NearCandidatesTable({ items }: { items: NearCandidate[]; stats: 
   return (
     <section className="near">
       <h3 className="near__title">조건에 가장 가까운 크리에이터</h3>
-      <p className="near__desc">세 조건 중 하나만 바꾸면 섭외할 수 있는 크리에이터입니다.</p>
+      <p className="near__desc">검색 조건 중 하나만 바꾸면 섭외할 수 있는 크리에이터입니다.</p>
       <div className="table-wrap">
         <table className="table">
           <thead>
