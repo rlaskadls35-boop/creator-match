@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 
@@ -28,9 +28,16 @@ describe('광고주 화면 스모크 (설계 §8)', () => {
     expect(screen.getByText('왜 추천하나요?')).toBeInTheDocument();
     expect(screen.getByText('유의점: 참여율은 마이크로 중 하위권입니다 (6.5%)')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /^평점/ }));
-    const afterSort = screen.getAllByRole('row');
-    expect(afterSort[afterSort.length - 1]).toHaveTextContent('캠페인 이력 없음');
+    // 광고주 평점으로 정렬하면 순위 열 제목이 바뀌고 표가 평점 내림차순으로 다시 그려진다
+    await user.click(screen.getByRole('button', { name: /^광고주 평점/ }));
+    const experienced = screen.getByRole('table', { name: '캠페인 이력이 있는 후보' });
+    expect(within(experienced).getByRole('columnheader', { name: '순위 (광고주 평점 기준)' })).toBeInTheDocument();
+    const ratings = within(experienced)
+      .getAllByRole('row')
+      .map((row) => row.querySelector('[data-label="광고주 평점"]'))
+      .filter((cell): cell is Element => cell !== null) // 머리글 줄과 펼친 설명 줄은 건너뛴다
+      .map((cell) => Number(cell.textContent!.split('/')[0]));
+    expect(ratings).toEqual([...ratings].sort((a, b) => b - a));
 
     await user.click(screen.getByRole('checkbox', { name: '캠페인 이력 있는 크리에이터만' }));
     expect(screen.getByText('캠페인 이력이 있는 후보 15명')).toBeInTheDocument();

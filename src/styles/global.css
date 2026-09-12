@@ -122,13 +122,20 @@ button { font: inherit; }
 .check input { width: 16px; height: 16px; accent-color: var(--primary); }
 
 /* ── 결과 표 ── */
-.table-wrap { background: var(--card); border-radius: var(--radius-card); box-shadow: var(--shadow); }
+/* 가로로 밀어 보는 표. 가로 스크롤은 세로도 함께 잘라내므로, 줄이 한둘뿐일 때도 ⓘ 말풍선이 들어갈 높이를 남긴다 */
+.table-wrap { background: var(--card); border-radius: var(--radius-card); box-shadow: var(--shadow); overflow-x: auto; min-height: 210px; }
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
-.table th { text-align: left; font-size: 13px; color: var(--text-muted); font-weight: 500; padding: 14px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-.table td { padding: 14px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; transition: background .15s ease; }
+.table { min-width: 1000px; }
+.table th { text-align: left; font-size: 13px; color: var(--text-muted); font-weight: 500; padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: bottom; word-break: keep-all; }
+.table th .th__head { display: flex; align-items: flex-end; gap: 2px; }
+.table th .sort-btn { text-align: left; align-items: flex-end; }
+.table td { padding: 13px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; transition: background .15s ease; white-space: nowrap; }
 .table tbody tr:last-child td { border-bottom: 0; }
 .table tbody tr:hover td { background: #FAFBFF; }
-.table .table__num { text-align: right; }
+.table .table__num { text-align: right; font-variant-numeric: tabular-nums; }
+.table th.table__num .th__head { justify-content: flex-end; }
+.table th.table__num .sort-btn { text-align: right; justify-content: flex-end; }
+.table .table__rate { color: var(--primary); font-weight: 700; }
 .table th.is-sorted { color: var(--primary-deep); font-weight: 700; }
 .table tbody tr.row--top td { background: var(--primary-soft); }
 .table tbody tr.row--top:hover td { background: #CFE0FC; }
@@ -141,6 +148,13 @@ button { font: inherit; }
 .sort-btn { border: 0; background: transparent; padding: 0; cursor: pointer; color: inherit; font: inherit; display: inline-flex; align-items: center; gap: 4px; transition: color .15s ease; }
 .sort-btn:hover { color: var(--primary); }
 .sort-btn__arrow { font-size: 11px; opacity: .7; }
+/* 매칭 점수 뱃지: 20점 단위로 색이 달라진다 (80점 이상 초록 → 20점 미만 빨강) */
+.score-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 46px; padding: 5px 11px; border-radius: 999px; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.score-badge[data-band="5"] { background: #D5F5E0; color: #15803D; }
+.score-badge[data-band="4"] { background: #E4F5C4; color: #4D7C0F; }
+.score-badge[data-band="3"] { background: #FDF0C4; color: #A16207; }
+.score-badge[data-band="2"] { background: #FFE0C7; color: #C2410C; }
+.score-badge[data-band="1"] { background: #FEE0E0; color: #B91C1C; }
 .rank { display: inline-flex; width: 28px; height: 28px; border-radius: 50%; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; background: var(--primary-soft); color: var(--primary-deep); }
 .rank--top { background: var(--primary); color: #fff; }
 .creator__name { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -298,30 +312,8 @@ html, body { overflow-x: hidden; }
   .bars__item { grid-template-columns: 110px 1fr 36px; }
   .bars__rank { grid-column: 2 / -1; }
 
-  /* 결과 표를 카드로 접어 가로 스크롤을 없앤다 (L23) */
+  /* 표는 표 모양 그대로 두고 손가락으로 옆으로 밀어 본다 */
   .toolbar__sort { display: inline-flex; }
-  .table-wrap { overflow: visible; }
-  .table, .table tbody { display: block; }
-  .table thead { display: none; }
-  .table tbody tr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; padding: 16px; border-bottom: 1px solid var(--border); }
-  .table tbody tr:last-child { border-bottom: 0; }
-  .table tbody td { display: block; border: 0; padding: 0; }
-  .table tbody tr:hover td, .table tbody tr.row--top td { background: transparent; }
-  .table tbody tr.row--top { background: var(--primary-soft); border-radius: var(--radius-card) var(--radius-card) 0 0; }
-  .table td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 2px; font-size: 11.5px; color: var(--text-muted); }
-  .table tbody td:nth-child(1) { grid-column: 1; grid-row: 1; }
-  .table tbody td.table__creator { grid-column: 1; grid-row: 2; }
-  .table tbody td:nth-child(3) { grid-column: 2; grid-row: 1 / span 2; text-align: right; }
-  .table tbody td:nth-child(4), .table tbody td:nth-child(5), .table tbody td:nth-child(7) { display: none; }
-  .table tbody td:nth-child(6) { grid-column: 1; grid-row: 3; }
-  .table tbody td:nth-child(8) { grid-column: 2; grid-row: 3; text-align: right; }
-  .table tbody td.table__action { grid-column: 1 / -1; grid-row: 4; text-align: right; }
-  .table .score { flex-direction: column; align-items: flex-end; gap: 2px; }
-  .table .score .bar { display: none; }
-  .table .score strong { font-size: 22px; }
-  .table tbody tr.explain-row { display: block; padding: 0; }
-  .table tbody tr.explain-row td { display: block; padding: 14px 14px 18px; }
-  .expand-btn--text { width: 100%; }
 }
 @media (max-width: 560px) {
   .header__title { font-size: 18px; }
@@ -358,13 +350,4 @@ html, body { overflow-x: hidden; }
 .new-candidates__sort { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
 .new-candidates__unknown { color: var(--text-muted); font-weight: 500; }
 .new-candidates__reference { display: block; margin-top: 5px; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
-.table--new { min-width: 720px; }
-@media (max-width: 767px) {
-  .table--new { min-width: 0; }
-  .table.table--new tbody tr { grid-template-columns: 1fr 1fr; gap: 14px 18px; }
-  .table.table--new tbody td { display: flex; grid-column: auto; grid-row: auto; flex-direction: column; gap: 4px; text-align: left; }
-  .table.table--new tbody td.table__creator { display: block; grid-column: 1 / -1; }
-  .table.table--new tbody td[data-label]::before { content: attr(data-label); font-size: 12px; color: var(--text-muted); }
-  .table.table--new tbody td:last-child { grid-column: 1 / -1; }
-  .new-candidates__reference { margin-top: 0; }
-}
+.table--new { min-width: 900px; }

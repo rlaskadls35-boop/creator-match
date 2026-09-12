@@ -1,6 +1,6 @@
 import type { Creator, DatasetStats } from '../domain/types';
 import type { NewCandidateSortKey } from '../domain/recommend';
-import { formatCompact, formatPercent, formatWon } from '../domain/format';
+import { formatInt, formatPercent, formatWon } from '../domain/format';
 import { Tooltip } from './Tooltip';
 
 interface Props {
@@ -35,11 +35,14 @@ export function NewCandidatesTable({ rows, stats, sortKey, onSortChange }: Props
             <thead>
               <tr>
                 <th scope="col">크리에이터</th>
-                <th scope="col" className="table__num">참여율</th>
+                <th scope="col">플랫폼</th>
+                <th scope="col">카테고리</th>
+                <th scope="col" className="table__num">팔로워 수</th>
                 <th scope="col" className="table__num">평균 조회수</th>
-                <th scope="col" className="table__num">캠페인</th>
-                <th scope="col" className="table__num">평점</th>
-                <th scope="col" className="table__num">단가</th>
+                <th scope="col" className="table__num">참여율</th>
+                <th scope="col" className="table__num">누적 캠페인</th>
+                <th scope="col" className="table__num">광고주 평점</th>
+                <th scope="col" className="table__num">1건 평균 단가</th>
               </tr>
             </thead>
             <tbody>
@@ -48,16 +51,18 @@ export function NewCandidatesTable({ rows, stats, sortKey, onSortChange }: Props
                 return (
                   <tr key={c.id}>
                     <td className="table__creator">
-                      <div className="creator__name"><strong>{c.name}</strong><span className="badge badge--warning">캠페인 이력 없음</span></div>
-                      <div className="creator__meta">{c.platform} · {c.category} · 팔로워 {formatCompact(c.followers)}</div>
+                      <div className="creator__name"><strong>{c.name}</strong></div>
                     </td>
+                    <td className="table__text" data-label="플랫폼">{c.platform}</td>
+                    <td className="table__text" data-label="카테고리">{c.category}</td>
+                    <td className="table__num" data-label="팔로워 수">{formatInt(c.followers)}명</td>
+                    <td className="table__num" data-label="평균 조회수">{formatInt(c.avgViewCount)}회</td>
                     <td className="table__num" data-label="참여율">{formatPercent(c.engagementRate)}</td>
-                    <td className="table__num" data-label="평균 조회수">{formatCompact(c.avgViewCount)}</td>
-                    <td className="table__num" data-label="캠페인">0건</td>
-                    <td className="table__num" data-label="평점"><span className="new-candidates__unknown">없음</span></td>
-                    <td className="table__num" data-label="단가">
+                    <td className="table__num" data-label="누적 캠페인">0건</td>
+                    <td className="table__num" data-label="광고주 평점"><span className="new-candidates__unknown">없음</span></td>
+                    <td className="table__num" data-label="1건 평균 단가">
                       <strong className="new-candidates__unknown">확인 필요</strong>
-                      {referenceRate > 0 && <span className="new-candidates__reference">같은 규모 참고 {formatCompact(referenceRate)}원<Tooltip label={`${c.name} 참고 단가 설명`} text={`이 후보의 견적이 아닙니다. 이력이 있는 ${c.tier} 크리에이터들의 평균 단가 중앙값 ${formatWon(referenceRate)}입니다. 예산 판단이나 매칭 점수에 사용하지 않습니다.`} /></span>}
+                      {referenceRate > 0 && <span className="new-candidates__reference">같은 규모 참고 {formatInt(referenceRate)}원<Tooltip label={`${c.name} 참고 단가 설명`} text={`이 후보의 견적이 아닙니다. 이력이 있는 ${c.tier} 크리에이터들의 평균 단가 중앙값 ${formatWon(referenceRate)}입니다. 예산 판단이나 매칭 점수에 사용하지 않습니다.`} /></span>}
                     </td>
                   </tr>
                 );

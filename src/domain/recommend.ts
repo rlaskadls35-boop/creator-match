@@ -24,7 +24,7 @@ export function filterCandidates<T extends Creator>(all: T[], input: SearchInput
 
 // ───────────── 정렬 (설계 §5.10) ─────────────
 
-export type SortKey = 'match' | 'engagement' | 'views' | 'rating' | 'campaigns' | 'rate';
+export type SortKey = 'match' | 'followers' | 'views' | 'engagement' | 'campaigns' | 'rating' | 'rate';
 export type SortDirection = 'asc' | 'desc';
 export interface SortState {
   key: SortKey;
@@ -34,15 +34,17 @@ export interface SortState {
 export const DEFAULT_SORT: SortState = { key: 'match', direction: 'desc' };
 
 export const SORT_DEFAULT_DIRECTION: Record<SortKey, SortDirection> = {
-  match: 'desc', engagement: 'desc', views: 'desc', rating: 'desc', campaigns: 'desc', rate: 'asc',
+  match: 'desc', followers: 'desc', views: 'desc', engagement: 'desc', campaigns: 'desc', rating: 'desc', rate: 'asc',
 };
 
 export const SORT_LABEL: Record<SortKey, string> = {
-  match: '매칭 점수', engagement: '참여율', views: '평균 조회수', rating: '광고주 평점', campaigns: '캠페인 건수', rate: '단가',
+  match: '매칭 점수', followers: '팔로워 수', views: '평균 조회수', engagement: '참여율',
+  campaigns: '누적 캠페인', rating: '광고주 평점', rate: '1건 평균 단가',
 };
 
 const SORT_VALUE: Record<SortKey, (c: RankedCreator) => number> = {
   match: (c) => c.matchScore,
+  followers: (c) => c.followers,
   engagement: (c) => c.engagementRate,
   views: (c) => c.avgViewCount,
   rating: (c) => c.rating,
