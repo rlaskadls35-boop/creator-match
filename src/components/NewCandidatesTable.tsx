@@ -10,7 +10,7 @@ interface Props {
 }
 
 const SORTABLE: { key: NewCandidateSortKey; heading: string }[] = [
-  { key: 'followers', heading: '팔로워\n수' },
+  { key: 'followers', heading: '팔로워수' },
   { key: 'views', heading: '평균\n조회수' },
   { key: 'engagement', heading: '참여율' },
 ];

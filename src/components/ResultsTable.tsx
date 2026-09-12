@@ -23,7 +23,7 @@ interface Props {
 
 const SORTABLE: { key: SortKey; label: string; heading?: string; tooltip?: string }[] = [
   { key: 'match', label: '매칭 점수', heading: '매칭\n점수', tooltip: '광고주 조건에 맞는 크리에이터들을 같은 규모 안에서 비교한 종합 점수입니다. 100점 만점이며, 20점 단위로 색이 달라집니다. 80점 이상 초록 → 20점 미만 빨강' },
-  { key: 'followers', label: '팔로워 수', heading: '팔로워\n수' },
+  { key: 'followers', label: '팔로워 수', heading: '팔로워수' },
   { key: 'views', label: '평균 조회수', heading: '평균\n조회수' },
   { key: 'engagement', label: '참여율' },
   { key: 'campaigns', label: '누적 캠페인', heading: '누적\n캠페인', tooltip: '지금까지 집행한 캠페인 건수입니다. 협업 경험을 참고하는 정보이며 매칭 점수에는 반영하지 않습니다.' },
