@@ -61,3 +61,38 @@ button { font: inherit; }
 .tip__trigger { border: 0; background: transparent; color: var(--primary); cursor: help; padding: 0 2px; font-size: 14px; line-height: 1; }
 .tip__bubble { display: none; position: absolute; z-index: 20; right: 0; bottom: calc(100% + 8px); width: 280px; max-width: 70vw; padding: 10px 12px; background: var(--text); color: #fff; font-size: 12.5px; line-height: 1.5; font-weight: 400; border-radius: 10px; text-align: left; white-space: normal; }
 .tip:hover .tip__bubble, .tip:focus-within .tip__bubble { display: block; }
+
+/* ── 입력 패널 ── */
+.panel { margin-bottom: 20px; }
+.panel__grid { display: grid; grid-template-columns: 1.1fr 1.4fr 1.5fr; gap: 28px; }
+.panel__submit { width: 100%; margin-top: 24px; padding: 14px; font-size: 16px; border-radius: 14px; }
+.field__label { font-weight: 700; font-size: 15px; margin-bottom: 4px; display: block; }
+.field__help { margin: 0 0 10px; font-size: 13px; color: var(--text-muted); }
+.field__error { margin: 8px 0 0; font-size: 13px; color: var(--destructive); }
+.input { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-input); padding: 12px 14px; font-size: 16px; background: #fff; color: var(--text); }
+.input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px var(--primary-soft); }
+.input[aria-invalid="true"] { border-color: var(--destructive); }
+.budget { display: grid; grid-template-columns: 1fr auto; gap: 8px 10px; align-items: center; }
+.budget__unit { color: var(--text-muted); }
+.budget__preview { grid-column: 1 / -1; min-height: 22px; color: var(--primary-deep); font-weight: 700; }
+
+/* ── 칩 ── */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.chip { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 999px; font-size: 14px; border: 1px solid var(--border); background: #fff; color: var(--text); line-height: 1.4; }
+.chip--toggle { cursor: pointer; transition: background .15s ease, color .15s ease, border-color .15s ease; }
+.chip--toggle:hover { border-color: var(--primary); color: var(--primary); }
+.chip--toggle.is-on { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 700; }
+
+/* ── 규모 카드 ── */
+.tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.tier-card { display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 14px; border: 1.5px solid var(--border); border-radius: 16px; background: #fff; cursor: pointer; color: var(--text); transition: border-color .15s ease, background .15s ease; }
+.tier-card:hover { border-color: var(--primary); }
+.tier-card.is-on { border-color: var(--primary); background: var(--primary-soft); }
+.tier-card__name { font-weight: 700; font-size: 16px; }
+.tier-card__range { font-size: 13px; color: var(--primary-deep); font-weight: 500; }
+.tier-card__trait, .tier-card__rate { font-size: 12.5px; color: var(--text-muted); }
+
+/* ── 결과 영역 ── */
+.results { margin-top: 8px; }
+.results__empty { text-align: center; color: var(--text-muted); padding: 40px 0; margin: 0; }
+.results__title { font-size: 18px; margin: 0; }
