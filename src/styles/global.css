@@ -231,12 +231,6 @@ button { font: inherit; }
 .weights__message--success { color: var(--positive-fg); }
 .weights__message--error { color: var(--destructive); }
 
-/* ── 미리보기 조건 줄 (운영자) ── */
-.conditions { display: flex; justify-content: space-between; align-items: center; gap: 10px 20px; flex-wrap: wrap; margin: 0 4px 10px; font-size: 13px; color: var(--text-muted); }
-.conditions__items { display: flex; align-items: center; gap: 8px 18px; flex-wrap: wrap; }
-.conditions strong { color: var(--text); font-weight: 600; }
-.conditions__note { white-space: nowrap; }
-.conditions__note[data-wait="true"] { color: var(--warning-fg); font-weight: 600; }
 
 /* ── 저장값 대비 변화 (운영자) ── */
 .delta { display: block; margin-top: 3px; font-size: 11.5px; font-weight: 500; color: var(--text-muted); }
@@ -294,7 +288,6 @@ html, body { overflow-x: hidden; }
   .weights__grid { grid-template-columns: 1fr 1fr; }
   .bars__item { grid-template-columns: 110px 1fr 36px; }
   .bars__rank { grid-column: 2 / -1; }
-  .conditions { margin-left: 0; margin-right: 0; }
 
   /* 결과 표를 카드로 접어 가로 스크롤을 없앤다 (L23) */
   .toolbar__sort { display: inline-flex; }

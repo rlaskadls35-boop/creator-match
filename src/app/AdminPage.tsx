@@ -6,7 +6,7 @@ import { Header } from '../components/Header';
 import { DataStatusFooter } from '../components/DataStatusFooter';
 import { WeightsCard } from '../components/WeightsCard';
 import { MatchingWorkspace } from '../components/MatchingWorkspace';
-import { DEFAULT_WEIGHTS, draftEquals, draftToWeights, loadWeights, saveWeights, toDraft } from '../domain/weights';
+import { DEFAULT_WEIGHTS, draftToWeights, loadWeights, saveWeights, toDraft } from '../domain/weights';
 import type { WeightsDraft } from '../domain/weights';
 import type { Weights } from '../domain/types';
 
@@ -51,13 +51,6 @@ export function AdminPage({ data }: { data: LoadedData }) {
     navigate('/');
   };
 
-  // 결과 줄에 붙는 안내: 지금 보는 순위가 어떤 비중으로 나온 것인지 (L23)
-  const previewNote = draftToWeights(draft) === null
-    ? { text: '미리보기 갱신 대기 · 마지막 100% 기준의 결과', waiting: true }
-    : draftEquals(preview, saved)
-      ? { text: '저장된 비중으로 계산', waiting: false }
-      : { text: '변경한 비중으로 미리보기 · 저장값과 비교', waiting: false };
-
   return (
     <div className="page">
       <Header variant="admin" accountName={ADMIN_ACCOUNT.id} onLogout={handleLogout} />
@@ -69,7 +62,6 @@ export function AdminPage({ data }: { data: LoadedData }) {
             stats={data.stats}
             weights={preview}
             savedWeights={saved}
-            previewNote={previewNote}
             afterSearchPanel={(
               <WeightsCard
                 draft={draft}

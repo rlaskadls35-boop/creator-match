@@ -58,9 +58,7 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     await searchThree(user);
     await openWeights(user);
 
-    expect(screen.getByText('미리보기 조건')).toBeInTheDocument();
     expect(screen.getByText('저장된 기준')).toBeInTheDocument();
-    expect(screen.getByText('저장된 비중으로 계산')).toBeInTheDocument();
     const before = screen.getAllByRole('row')[1].textContent;
 
     // 참여율 30 → 40 (합계 110)
@@ -70,7 +68,6 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
 
     expect(screen.getByText('합계 110% / 100%')).toBeInTheDocument();
     expect(screen.getByText('10% 초과 · 비중을 낮춰 100%를 맞추세요.')).toBeInTheDocument();
-    expect(screen.getByText('미리보기 갱신 대기 · 마지막 100% 기준의 결과')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '비중 저장' })).toBeDisabled();
     expect(screen.getAllByRole('row')[1].textContent).toBe(before); // 결과는 그대로
 
@@ -80,7 +77,6 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     await user.type(views, '18');
 
     expect(screen.getByText('합계 100% / 100%')).toBeInTheDocument();
-    expect(screen.getByText('변경한 비중으로 미리보기 · 저장값과 비교')).toBeInTheDocument();
     expect(screen.getByText('저장하지 않은 변경')).toBeInTheDocument();
     expect(screen.getAllByRole('row')[1].textContent).not.toBe(before);
     expect(screen.getByRole('button', { name: '비중 저장' })).toBeEnabled();
