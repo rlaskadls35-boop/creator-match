@@ -87,7 +87,7 @@ export function SearchPanel({ value, onChange, onSubmit }: Props) {
             <div className="field__label" id="platform-label">플랫폼</div>
           </div>
           <div className="field__control">
-            <div className="segment panel__platform" role="radiogroup" aria-labelledby="platform-label">
+            <div className="segment panel__segment" role="radiogroup" aria-labelledby="platform-label">
               {(['all', ...PLATFORMS] as const).map((platform) => {
                 const on = value.platform === platform;
                 return (
@@ -175,12 +175,51 @@ export function SearchPanel({ value, onChange, onSubmit }: Props) {
           </div>
         </div>
 
+        <div className="field field--history">
+          <div className="field__head">
+            <div className="field__label" id="history-label">캠페인 이력</div>
+          </div>
+          <div className="field__control">
+            <div
+              className="segment panel__segment"
+              role="radiogroup"
+              aria-labelledby="history-label"
+              onKeyDown={(e) => {
+                const next = e.key === 'Home' ? false : e.key === 'End' ? true
+                  : ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key) ? !value.historyOnly : null;
+                if (next === null) return;
+                e.preventDefault();
+                onChange({ ...value, historyOnly: next });
+                e.currentTarget.querySelectorAll<HTMLButtonElement>('[role="radio"]')[Number(next)]?.focus();
+              }}
+            >
+              {[false, true].map((historyOnly) => {
+                const on = value.historyOnly === historyOnly;
+                return (
+                  <button
+                    key={String(historyOnly)}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    tabIndex={on ? 0 : -1}
+                    className={`segment__item${on ? ' is-on' : ''}`}
+                    onClick={() => onChange({ ...value, historyOnly })}
+                  >
+                    {historyOnly ? '이력 있는 후보만' : '전체'}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         <div className="panel__footer">
           <div className="panel__summary" aria-label="지금 선택한 조건">
             <span>플랫폼 <strong>{value.platform === 'all' ? '전체' : value.platform}</strong></span>
             <span>1명당 예산 {budget !== null ? <strong>{formatWon(budget)}</strong> : <strong className="is-empty">미입력</strong>}</span>
             <span>규모 {value.tier !== null ? <strong>{value.tier}</strong> : <strong className="is-empty">미선택</strong>}</span>
             <span>카테고리 {value.categories.length > 0 ? <strong>{value.categories.join(', ')}</strong> : <strong className="is-empty">미선택</strong>}</span>
+            <span>캠페인 이력 <strong>{value.historyOnly ? '이력 있는 후보만' : '전체'}</strong></span>
           </div>
           <button type="submit" className="btn btn--primary panel__submit" disabled={!canSubmit}>크리에이터 찾기</button>
         </div>

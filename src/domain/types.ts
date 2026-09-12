@@ -42,6 +42,8 @@ export interface MetricScore {
   groupSize: number;
   /** 같은 값이 한 명 이상 더 있으면 공동 등수 */
   tied: boolean;
+  /** 본인을 제외한 동점자 수 */
+  tieCount: number;
   /** '나노' | '마이크로' | '매크로' | '전체' */
   groupLabel: string;
 }

@@ -67,20 +67,20 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
     return new Map(ordered.map((c, i) => [c.id, i + 1]));
   }, [savedScoreById, visible, sort]);
 
-  const runSearch = (input: SearchInput) => {
+  const runSearch = (input: SearchInput, nextFilters: ResultFilters) => {
     setQuery(input);
     setSort(DEFAULT_SORT);
-    setFilters(DEFAULT_FILTERS);
+    setFilters(nextFilters);
     setExpandedId(null);
     setNewSort(DEFAULT_NEW_SORT);
   };
   const handleSubmit = () => {
     const input = toSearchInput(form);
-    if (input) runSearch(input);
+    if (input) runSearch(input, { historyOnly: form.historyOnly });
   };
   const handleRelax = (next: SearchInput) => {
-    setForm(fromSearchInput(next)); // 폼에도 바뀐 값 반영 (설계 §6.2)
-    runSearch(next);
+    setForm({ ...fromSearchInput(next), historyOnly: filters.historyOnly }); // 검색에 적용된 이력 조건도 유지한다
+    runSearch(next, filters);
   };
   const handleSort = (key: SortKey) =>
     setSort((s) => (s.key === key ? { key, direction: s.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: SORT_DEFAULT_DIRECTION[key] }));
@@ -97,7 +97,7 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
           <p className="results__empty">조건을 입력하고 크리에이터 찾기를 누르세요</p>
         ) : (
           <>
-            <ResultsToolbar count={visible.length} filters={filters} onChange={setFilters} sort={sort} onSortChange={handleSort} />
+            <ResultsToolbar count={visible.length} sort={sort} onSortChange={handleSort} />
             <p className="results__context">과거 평균 단가가 입력 예산 이내인 후보입니다. 캠페인 건수는 참고 정보로 표시합니다.</p>
             {isZero ? (
               near.length > 0 ? (

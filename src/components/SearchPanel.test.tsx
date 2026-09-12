@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { useState } from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SearchPanel } from './SearchPanel';
 import { EMPTY_FORM } from '../domain/searchForm';
@@ -50,8 +50,30 @@ describe('SearchPanel 플랫폼 검색 조건', () => {
     render(<Harness />);
     const user = userEvent.setup();
 
-    expect(screen.getByRole('radio', { name: '전체' })).toHaveAttribute('aria-checked', 'true');
+    expect(within(screen.getByRole('radiogroup', { name: '플랫폼' })).getByRole('radio', { name: '전체' })).toHaveAttribute('aria-checked', 'true');
     await user.click(screen.getByRole('radio', { name: '유튜브' }));
     expect(screen.getByRole('radio', { name: '유튜브' })).toHaveAttribute('aria-checked', 'true');
+  });
+});
+
+describe('SearchPanel 캠페인 이력 선택', () => {
+  it('전체가 기본값이며 클릭과 방향키로 하나만 선택하고 조건 요약에 반영한다', async () => {
+    render(<Harness />);
+    const user = userEvent.setup();
+    const history = within(screen.getByRole('radiogroup', { name: '캠페인 이력' }));
+    const all = history.getByRole('radio', { name: '전체' });
+    const historyOnly = history.getByRole('radio', { name: '이력 있는 후보만' });
+
+    expect(all).toHaveAttribute('aria-checked', 'true');
+    await user.click(historyOnly);
+    expect(historyOnly).toHaveAttribute('aria-checked', 'true');
+    expect(all).toHaveAttribute('aria-checked', 'false');
+    expect(screen.getByLabelText('지금 선택한 조건')).toHaveTextContent('캠페인 이력 이력 있는 후보만');
+
+    await user.keyboard('{ArrowLeft}');
+    expect(all).toHaveFocus();
+    expect(all).toHaveAttribute('aria-checked', 'true');
+    expect(historyOnly).toHaveAttribute('aria-checked', 'false');
+    expect(screen.getByLabelText('지금 선택한 조건')).toHaveTextContent('캠페인 이력 전체');
   });
 });

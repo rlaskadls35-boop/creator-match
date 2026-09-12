@@ -6,9 +6,10 @@ export interface SearchFormState {
   budgetText: string;
   categories: Category[];
   tier: Tier | null;
+  historyOnly: boolean;
 }
 
-export const EMPTY_FORM: SearchFormState = { platform: 'all', budgetText: '', categories: [], tier: null };
+export const EMPTY_FORM: SearchFormState = { platform: 'all', budgetText: '', categories: [], tier: null, historyOnly: false };
 
 /** 입력 문자열에서 숫자만 남기고 천 단위 콤마를 넣는다 */
 export function formatBudgetText(text: string): string {
@@ -45,5 +46,5 @@ export function toSearchInput(form: SearchFormState): SearchInput | null {
 
 /** 완화 버튼으로 조건이 바뀌면 폼에도 반영한다 (설계 §6.2) */
 export function fromSearchInput(input: SearchInput): SearchFormState {
-  return { platform: input.platform, budgetText: formatBudgetText(String(input.budget)), categories: [...input.categories], tier: input.tier };
+  return { platform: input.platform, budgetText: formatBudgetText(String(input.budget)), categories: [...input.categories], tier: input.tier, historyOnly: false };
 }

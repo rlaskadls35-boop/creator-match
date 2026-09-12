@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Creator Match · 매칭 점수 개선 프로토타입</title>
+  <link rel="stylesheet" href="prototype.css" />
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="#" aria-label="Creator Match 처음으로"><span class="brand-mark"><svg viewBox="0 0 32 32" fill="none"><path d="M6 23C14 23 12 8 21 8c3 0 5 2 5 5" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><circle cx="23" cy="23" r="3" fill="currentColor"/></svg></span>Creator Match <span class="admin-tag">운영자</span></a>
+    <div class="header-actions"><span class="prototype-tag">화면 개선 프로토타입</span><button id="reset" class="quiet-button">↺ 예시 초기화</button><span class="avatar">A</span></div>
+  </header>
+  <main>
+    <div class="page-heading"><div><h1>크리에이터 찾기</h1><p>조건에 맞는 후보를 찾고, 매칭 점수의 근거까지 확인하세요.</p></div><span class="sample-note">첨부 화면의 조건으로 시작해요</span></div>
+    <div class="settings-grid">
+      <section class="surface search-card" aria-labelledby="search-title">
+        <div class="section-heading"><h2 id="search-title"><span class="step">1</span>검색 조건</h2><span>어떤 크리에이터를 찾을까요?</span></div>
+        <form id="search-form">
+          <div class="filter-grid">
+            <fieldset><legend>플랫폼</legend><div class="segmented" id="platforms"></div></fieldset>
+            <div><label for="budget">1명당 섭외 예산</label><div class="budget-input"><input id="budget" inputmode="numeric" value="1,500,000" autocomplete="off"/><span>원</span></div><small id="budget-hint">150만 원 이하</small></div>
+            <fieldset class="tier-field"><legend>크리에이터 규모 <span class="label-hint">구독자·팔로워 수 기준</span></legend><div class="tier-options" id="tiers"></div></fieldset>
+            <fieldset class="category-field"><legend>캠페인 카테고리 <span class="label-hint">복수 선택</span></legend><div class="chips" id="categories"></div></fieldset>
+          </div>
+          <div class="search-footer"><span id="search-state">과거 평균 단가가 예산 이내인 후보를 찾아요.</span><button type="submit" class="primary-button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>크리에이터 찾기</button></div>
+        </form>
+      </section>
+      <section class="surface weights-card" aria-labelledby="weights-title">
+        <div class="section-heading"><h2 id="weights-title"><span class="step">2</span>매칭 점수 비중</h2><span id="weight-state" class="status-chip">적용 중</span></div>
+        <p class="weight-intro">더 중요하게 보는 항목의 비중을 높여보세요.</p>
+        <div id="weights"></div>
+        <div class="weights-footer"><div id="weight-total" role="status"></div><button id="apply-weights" class="secondary-button">비중 적용</button></div>
+      </section>
+    </div>
+    <section class="results" aria-labelledby="results-title">
+      <div class="results-heading"><div><h2 id="results-title">검색 결과 <span id="result-count">5</span></h2><p id="query-summary"></p></div><div class="result-actions"><label class="checkbox"><input type="checkbox" id="history-only"/>캠페인 이력 있는 후보만</label><select id="sort" aria-label="후보 정렬"><option value="match">매칭 점수 높은 순</option><option value="cost">조회당 비용 낮은 순</option><option value="views">평균 조회수 높은 순</option></select></div></div>
+      <div id="result-notice" class="result-notice" role="status" hidden></div>
+      <p class="mobile-table-hint">표를 좌우로 움직이면 모든 수치와 계산 내역을 볼 수 있어요. ↔</p>
+      <div class="surface table-shell"><div class="table-scroll"><table class="creator-table"><caption class="sr-only">캠페인 이력이 있는 후보와 매칭 점수 계산 내역</caption><colgroup><col style="width:5%"/><col style="width:18%"/><col style="width:9%"/><col style="width:10%"/><col style="width:10%"/><col style="width:8%"/><col style="width:10%"/><col style="width:11%"/><col style="width:9%"/><col style="width:10%"/></colgroup><thead><tr><th>순위</th><th class="align-left">크리에이터</th><th class="blue">매칭 점수</th><th>구독자·팔로워</th><th>평균 조회수</th><th>참여율</th><th>광고주 평점</th><th>1건 평균 단가</th><th>조회당 비용</th><th>계산 내역</th></tr></thead><tbody id="results-body"></tbody></table></div></div>
+      <div id="new-candidates"></div>
+      <p class="data-note">기존 프로젝트 데이터로 계산한 미리보기입니다. 이 화면의 조건과 비중은 프로토타입 안에서만 적용됩니다.</p>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script src="creators.js"></script>
+  <script src="prototype.js"></script>
+</body>
+</html>

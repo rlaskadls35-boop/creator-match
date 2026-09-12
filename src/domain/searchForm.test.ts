@@ -19,10 +19,10 @@ describe('searchForm', () => {
     expect(e.budget).toBe('예산을 입력해 주세요. 0보다 큰 금액이어야 합니다.');
     expect(e.categories).toBe('카테고리를 하나 이상 선택해 주세요.');
     expect(e.tier).toBe('크리에이터 규모를 선택해 주세요.');
-    expect(validateForm({ platform: 'all', budgetText: '1,500,000', categories: ['뷰티'], tier: '마이크로' })).toEqual({});
+    expect(validateForm({ platform: 'all', budgetText: '1,500,000', categories: ['뷰티'], tier: '마이크로', historyOnly: false })).toEqual({});
   });
   it('toSearchInput ↔ fromSearchInput 왕복', () => {
-    const form = { platform: '유튜브' as const, budgetText: '1,500,000', categories: ['뷰티', '패션'] as ('뷰티' | '패션')[], tier: '마이크로' as const };
+    const form = { platform: '유튜브' as const, budgetText: '1,500,000', categories: ['뷰티', '패션'] as ('뷰티' | '패션')[], tier: '마이크로' as const, historyOnly: false };
     const input = toSearchInput(form)!;
     expect(input).toEqual({ platform: '유튜브', budget: 1_500_000, categories: ['뷰티', '패션'], tier: '마이크로' });
     expect(fromSearchInput(input)).toEqual(form);

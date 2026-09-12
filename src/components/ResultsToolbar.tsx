@@ -1,10 +1,8 @@
 import { SORT_LABEL } from '../domain/recommend';
-import type { ResultFilters, SortKey, SortState } from '../domain/recommend';
+import type { SortKey, SortState } from '../domain/recommend';
 
 interface Props {
   count: number;
-  filters: ResultFilters;
-  onChange: (f: ResultFilters) => void;
   sort: SortState;
   onSortChange: (key: SortKey) => void;
 }
@@ -12,8 +10,8 @@ interface Props {
 /** 좁은 화면에서는 표가 카드로 접혀 머리글 정렬 버튼이 없으므로 여기서 정렬한다 (L23) */
 const SORT_KEYS: SortKey[] = ['match', 'engagement', 'views', 'campaigns', 'rating', 'rate', 'costPerView'];
 
-/** 결과 조작 줄: 인원 제목 + 이력 체크 (플랫폼은 검색 전 조건에서 선택한다) */
-export function ResultsToolbar({ count, filters, onChange, sort, onSortChange }: Props) {
+/** 결과 조작 줄: 인원 제목 + 좁은 화면의 정렬 선택 */
+export function ResultsToolbar({ count, sort, onSortChange }: Props) {
   return (
     <div className="toolbar">
       <h2 className="results__title">캠페인 이력이 있는 후보 {count}명</h2>
@@ -29,10 +27,6 @@ export function ResultsToolbar({ count, filters, onChange, sort, onSortChange }:
             {sort.direction === 'asc' ? '▲' : '▼'}
           </button>
         </div>
-        <label className="check">
-          <input type="checkbox" checked={filters.historyOnly} onChange={(e) => onChange({ ...filters, historyOnly: e.target.checked })} />
-          캠페인 이력 있는 크리에이터만
-        </label>
       </div>
     </div>
   );
