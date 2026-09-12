@@ -37,12 +37,12 @@ export function NewCandidatesTable({ rows, stats, sortKey, onSortChange }: Props
                 <th scope="col">크리에이터</th>
                 <th scope="col">플랫폼</th>
                 <th scope="col">카테고리</th>
-                <th scope="col" className="table__num">팔로워 수</th>
-                <th scope="col" className="table__num">평균 조회수</th>
+                <th scope="col" className="table__num"><span className="th__label">{'팔로워\n수'}</span></th>
+                <th scope="col" className="table__num"><span className="th__label">{'평균\n조회수'}</span></th>
                 <th scope="col" className="table__num">참여율</th>
-                <th scope="col" className="table__num">누적 캠페인</th>
-                <th scope="col" className="table__num">광고주 평점</th>
-                <th scope="col" className="table__num">1건 평균 단가</th>
+                <th scope="col" className="table__num"><span className="th__label">{'누적\n캠페인'}</span></th>
+                <th scope="col" className="table__num"><span className="th__label">{'광고주\n평점'}</span></th>
+                <th scope="col" className="table__num"><span className="th__label">{'1건 평균\n단가'}</span></th>
               </tr>
             </thead>
             <tbody>

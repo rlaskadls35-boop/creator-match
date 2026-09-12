@@ -24,7 +24,7 @@ export function filterCandidates<T extends Creator>(all: T[], input: SearchInput
 
 // ───────────── 정렬 (설계 §5.10) ─────────────
 
-export type SortKey = 'match' | 'followers' | 'views' | 'engagement' | 'campaigns' | 'rating' | 'rate';
+export type SortKey = 'match' | 'followers' | 'views' | 'engagement' | 'campaigns' | 'rating' | 'rate' | 'costPerView';
 export type SortDirection = 'asc' | 'desc';
 export interface SortState {
   key: SortKey;
@@ -34,12 +34,12 @@ export interface SortState {
 export const DEFAULT_SORT: SortState = { key: 'match', direction: 'desc' };
 
 export const SORT_DEFAULT_DIRECTION: Record<SortKey, SortDirection> = {
-  match: 'desc', followers: 'desc', views: 'desc', engagement: 'desc', campaigns: 'desc', rating: 'desc', rate: 'asc',
+  match: 'desc', followers: 'desc', views: 'desc', engagement: 'desc', campaigns: 'desc', rating: 'desc', rate: 'asc', costPerView: 'asc',
 };
 
 export const SORT_LABEL: Record<SortKey, string> = {
   match: '매칭 점수', followers: '팔로워 수', views: '평균 조회수', engagement: '참여율',
-  campaigns: '누적 캠페인', rating: '광고주 평점', rate: '1건 평균 단가',
+  campaigns: '누적 캠페인', rating: '광고주 평점', rate: '1건 평균 단가', costPerView: '1조회당 비용',
 };
 
 const SORT_VALUE: Record<SortKey, (c: RankedCreator) => number> = {
@@ -50,6 +50,7 @@ const SORT_VALUE: Record<SortKey, (c: RankedCreator) => number> = {
   rating: (c) => c.rating,
   campaigns: (c) => c.totalCampaignCount,
   rate: (c) => c.rate,
+  costPerView: (c) => c.costPerView,
 };
 
 /** 순서만 바꾼다. 매칭 점수는 그대로. 평점순에서는 이력 없음(예상 평점)이 방향과 무관하게 맨 아래 */

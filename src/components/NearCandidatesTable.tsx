@@ -14,11 +14,11 @@ export function NearCandidatesTable({ items }: { items: NearCandidate[]; stats: 
             <tr>
               <th scope="col">순위</th>
               <th scope="col">크리에이터</th>
-              <th scope="col" className="table__num">매칭 점수</th>
+              <th scope="col" className="table__num"><span className="th__label">{'매칭\n점수'}</span></th>
               <th scope="col" className="table__num">참여율</th>
-              <th scope="col" className="table__num">평균 조회수</th>
+              <th scope="col" className="table__num"><span className="th__label">{'평균\n조회수'}</span></th>
               <th scope="col" className="table__num">단가</th>
-              <th scope="col">이렇게 바꾸면 섭외 가능</th>
+              <th scope="col"><span className="th__label">{'이렇게 바꾸면\n섭외 가능'}</span></th>
             </tr>
           </thead>
           <tbody>

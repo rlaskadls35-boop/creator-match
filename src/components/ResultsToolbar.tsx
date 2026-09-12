@@ -10,7 +10,7 @@ interface Props {
 }
 
 /** 좁은 화면에서는 표가 카드로 접혀 머리글 정렬 버튼이 없으므로 여기서 정렬한다 (L23) */
-const SORT_KEYS: SortKey[] = ['match', 'engagement', 'views', 'campaigns', 'rating', 'rate'];
+const SORT_KEYS: SortKey[] = ['match', 'engagement', 'views', 'campaigns', 'rating', 'rate', 'costPerView'];
 
 /** 결과 조작 줄: 인원 제목 + 이력 체크 (플랫폼은 검색 전 조건에서 선택한다) */
 export function ResultsToolbar({ count, filters, onChange, sort, onSortChange }: Props) {
