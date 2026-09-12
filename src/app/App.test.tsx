@@ -47,8 +47,10 @@ describe('광고주 화면 스모크 (설계 §8)', () => {
       .map((cell) => Number(cell.textContent!.split('/')[0]));
     expect(ratings).toEqual([...ratings].sort((a, b) => b - a));
 
-    await user.click(screen.getByRole('checkbox', { name: '캠페인 이력 있는 크리에이터만' }));
+    await user.click(screen.getByRole('radio', { name: '이력 있는 후보만' }));
+    await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
     expect(screen.getByText('캠페인 이력이 있는 후보 6명')).toBeInTheDocument();
+    expect(screen.queryByRole('table', { name: '캠페인 이력이 없는 후보' })).not.toBeInTheDocument();
   });
   it('로드 실패 안내에서 다시 시도하면 검색 화면으로 복구된다', async () => {
     vi.mocked(fetch).mockResolvedValueOnce(new Response(null, { status: 503 }));

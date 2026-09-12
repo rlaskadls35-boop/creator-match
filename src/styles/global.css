@@ -114,13 +114,11 @@ button { font: inherit; }
 .segment { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; background: #fff; padding: 3px; }
 .segment__item { border: 0; background: transparent; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-size: 14px; color: var(--text-muted); transition: background .15s ease, color .15s ease; }
 .segment__item.is-on { background: var(--primary); color: #fff; font-weight: 700; }
-.panel__platform { justify-self: start; align-items: center; }
-.panel__platform .segment__item { padding: 6px 18px; white-space: nowrap; }
-.check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.panel__segment { justify-self: start; align-items: center; }
+.panel__segment .segment__item { padding: 6px 18px; white-space: nowrap; }
 .toolbar__sort { display: none; align-items: center; gap: 6px; font-size: 13.5px; color: var(--text-muted); }
 .toolbar__select { border: 1px solid var(--border); border-radius: 10px; padding: 7px 10px; background: #fff; color: var(--text); font: inherit; font-size: 13.5px; }
 .toolbar__dir { border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--primary-deep); width: 34px; height: 34px; cursor: pointer; font-size: 11px; }
-.check input { width: 16px; height: 16px; accent-color: var(--primary); }
 
 /* ── 결과 표 ── */
 /* PC에서는 화면 안에 맞추고, 모바일에서만 표 안의 가로 스크롤을 허용한다. */

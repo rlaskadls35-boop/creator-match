@@ -45,15 +45,22 @@ describe('후보 1~2명일 때의 완화 버튼: 클릭 → 폼 반영 → 재�
     await user.type(screen.getByLabelText('크리에이터 1명당 섭외 예산'), '3100000');
     await user.click(screen.getByRole('button', { name: '뷰티' }));
     await user.click(screen.getByRole('radio', { name: /매크로/ }));
+    await user.click(screen.getByRole('radio', { name: '이력 있는 후보만' }));
     await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
 
     expect(await screen.findByText('캠페인 이력이 있는 후보 1명')).toBeInTheDocument();
     expect(screen.getByText('이력이 있는 후보가 적습니다. 조건을 넓히면 더 볼 수 있습니다.')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /캠페인 이력이 없는 후보/ })).not.toBeInTheDocument();
+
+    // 아직 검색하지 않은 선택은 적용하지 않고, 완화 전 검색의 이력 조건을 유지한다.
+    await user.click(within(screen.getByRole('radiogroup', { name: '캠페인 이력' })).getByRole('radio', { name: '전체' }));
 
     await user.click(screen.getByRole('button', { name: /예산을 658만 원으로 올리면/ }));
 
     expect(await screen.findByText('캠페인 이력이 있는 후보 2명')).toBeInTheDocument();
     expect(screen.getByLabelText('크리에이터 1명당 섭외 예산')).toHaveValue('6,580,000');
+    expect(screen.getByRole('radio', { name: '이력 있는 후보만' })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.queryByRole('heading', { name: /캠페인 이력이 없는 후보/ })).not.toBeInTheDocument();
   });
 });
 
@@ -95,8 +102,17 @@ describe('기존 후보와 신규 후보 분리', () => {
     expect(within(experienced).getAllByRole('row')).toHaveLength(4);
     expect(within(fresh).getAllByRole('row')).toHaveLength(2);
     expect(within(fresh).getByRole('columnheader', { name: '참여율' })).toHaveAttribute('aria-sort', 'descending');
-    await user.click(screen.getByRole('checkbox', { name: '캠페인 이력 있는 크리에이터만' }));
+    expect(screen.queryByRole('checkbox', { name: '캠페인 이력 있는 크리에이터만' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('radio', { name: '이력 있는 후보만' }));
+    expect(fresh).toBeInTheDocument(); // 선택만 바꾸면 현재 결과를 유지한다.
+    await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
     expect(screen.queryByRole('table', { name: '캠페인 이력이 없는 후보' })).not.toBeInTheDocument();
+    expect(within(experienced).getAllByRole('row')).toHaveLength(4);
+
+    await user.click(within(screen.getByRole('radiogroup', { name: '캠페인 이력' })).getByRole('radio', { name: '전체' }));
+    expect(screen.queryByRole('table', { name: '캠페인 이력이 없는 후보' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
+    expect(screen.getByRole('table', { name: '캠페인 이력이 없는 후보' })).toBeInTheDocument();
   });
 
   it('예산 내 기존 후보가 없어도 신규 후보는 예산 미확인 안내와 함께 표시된다', async () => {
@@ -112,5 +128,10 @@ describe('기존 후보와 신규 후보 분리', () => {
     const fresh = screen.getByRole('table', { name: '캠페인 이력이 없는 후보' });
     expect(within(fresh).getByText('유나매거진115')).toBeInTheDocument();
     expect(screen.getByText(/단가 정보가 없어 예산 충족 여부는 별도 확인이 필요합니다/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('radio', { name: '이력 있는 후보만' }));
+    await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
+    expect(screen.getByText('캠페인 이력이 있는 후보 0명')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /캠페인 이력이 없는 후보/ })).not.toBeInTheDocument();
   });
 });
