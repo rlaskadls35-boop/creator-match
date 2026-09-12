@@ -4,6 +4,10 @@
 
 지원자: 김태홍
 
+**[실행 페이지 바로가기](https://rlaskadls35-boop.github.io/creator-match/)** · [GitHub 저장소](https://github.com/rlaskadls35-boop/creator-match)
+
+설치 없이 실행 페이지에서 검색과 점수 계산을 확인할 수 있습니다. 일반 검색은 로그인 없이 이용하며, 운영자 임시 계정은 `admin` / `demo1234`입니다.
+
 ## 실행 방법
 
 Node.js **22.22.2 이상인 22.x**, **24.15.0 이상인 24.x**, 또는 **26 이상**과 npm이 필요합니다. 잠금 파일에 고정된 의존성의 실행 조건이며, 제출 준비 시 Node.js 26.3.0에서 검증했습니다. 별도 DB 서버·API 키·환경변수는 필요하지 않습니다.
