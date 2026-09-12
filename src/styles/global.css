@@ -190,3 +190,24 @@ button { font: inherit; }
 .weights__warning { margin: 0 0 14px; font-size: 13px; color: var(--warning-fg); }
 .weights__actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .weights__message { font-size: 13.5px; color: var(--positive-fg); }
+
+/* ── 반응형 (설계 §6.5) ── */
+html, body { overflow-x: hidden; }
+@media (max-width: 1100px) {
+  .panel__grid { grid-template-columns: 1fr; gap: 20px; }
+  .weights__grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 767px) {
+  .main, .header, .footer { padding-left: 16px; padding-right: 16px; }
+  .intro { font-size: 18px; }
+  .tiers { grid-template-columns: 1fr; }
+  .table { min-width: 860px; }
+  .weights__grid { grid-template-columns: 1fr 1fr; }
+  .bars__item { grid-template-columns: 110px 1fr 36px; }
+  .bars__rank { grid-column: 2 / -1; }
+}
+
+/* ── 동작 축소 존중 ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
