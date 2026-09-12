@@ -2,8 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import {
-  ArrowRight, Check, CheckCheck, CircleCheck, Info,
-  Layers3, RotateCcw, SlidersHorizontal, Sparkles, UsersRound, Wallet, X,
+  ArrowRight, Check, CircleCheck, Info, RotateCcw, SlidersHorizontal, X,
 } from "lucide-react";
 
 const categories = ["뷰티", "식품", "패션", "피트니스", "여행", "아웃도어", "라이프스타일", "테크", "게임", "교육"];
@@ -33,8 +32,6 @@ export default function Home() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [confirmed, setConfirmed] = useState(false);
   const numericBudget = Number(budget);
-  const selectedSize = sizes.find((item) => item.id === size);
-  const completedCount = Number(numericBudget > 0) + Number(selectedCategories.length > 0) + Number(Boolean(size));
 
   function updateBudget(value: string) {
     const normalized = value.replace(/,/g, "").trim();
@@ -90,16 +87,10 @@ export default function Home() {
       </header>
 
       <main id="main" className="main-content">
-        <div className="intro">
-          <div className="intro-label"><span />좋은 협업의 시작</div>
-          <h1>우리 브랜드에 맞는<br />크리에이터를 찾아보세요.</h1>
-          <p>캠페인에 필요한 세 가지 조건을 알려주세요.</p>
-        </div>
-
         <div className="workspace-grid">
           <section className="form-card" aria-labelledby="form-heading">
             <div className="form-card-header">
-              <div className="section-title"><SlidersHorizontal size={20} strokeWidth={1.8} /><h2 id="form-heading">캠페인 조건</h2></div>
+              <div className="section-title"><SlidersHorizontal size={20} strokeWidth={1.8} /><h1 id="form-heading">캠페인 조건</h1></div>
               <span className="required-caption"><span>*</span> 필수 입력</span>
             </div>
 
@@ -172,23 +163,10 @@ export default function Home() {
                 <button className="reset-button" type="button" onClick={resetForm}><RotateCcw size={15} />초기화</button>
                 <button className="primary-button" type="submit">조건 확인하기<ArrowRight size={18} /></button>
               </div>
-              {confirmed && <div className="confirmation" role="status"><CircleCheck size={19} /><div><strong>캠페인 조건이 준비됐어요.</strong><p>선택한 조건을 요약에서 확인해 주세요.</p></div><button type="button" aria-label="확인 메시지 닫기" onClick={() => setConfirmed(false)}><X size={16} /></button></div>}
+              {confirmed && <div className="confirmation" role="status"><CircleCheck size={19} /><div><strong>캠페인 조건이 준비됐어요.</strong><p>예산과 카테고리, 팔로워 규모가 모두 입력됐어요.</p></div><button type="button" aria-label="확인 메시지 닫기" onClick={() => setConfirmed(false)}><X size={16} /></button></div>}
             </form>
           </section>
 
-          <aside className="summary-column" aria-label="캠페인 조건 요약">
-            <section className="summary-card">
-              <div className="summary-title"><h2>선택한 조건</h2><span className="summary-icon"><Layers3 size={19} strokeWidth={1.8} /></span></div>
-              <p className="summary-description">캠페인의 방향을 한눈에 확인하세요.</p>
-              <div className="summary-items">
-                <div className="summary-item"><div className="summary-item-label"><Wallet size={16} /><span>캠페인 예산</span></div><p className={numericBudget > 0 ? "summary-budget" : "summary-empty"}>{numericBudget > 0 ? koreanAmount(numericBudget) : "예산을 입력해 주세요"}</p></div>
-                <div className="summary-item"><div className="summary-item-label"><Layers3 size={16} /><span>카테고리</span></div>{selectedCategories.length ? <div className="summary-tags">{selectedCategories.map((category) => <span key={category}>{category}</span>)}</div> : <p className="summary-empty">카테고리를 선택해 주세요</p>}</div>
-                <div className="summary-item"><div className="summary-item-label"><UsersRound size={16} /><span>팔로워 규모</span></div>{selectedSize ? <p className="summary-size">{selectedSize.name}<span>{selectedSize.range}</span></p> : <p className="summary-empty">규모를 선택해 주세요</p>}</div>
-              </div>
-              <div className="completion-area"><div><span>{completedCount === 3 ? <><CheckCheck size={15} />모든 조건이 입력됐어요</> : "조건을 채워 주세요"}</span><strong>{completedCount}<span> / 3</span></strong></div><div className="progress-track" role="progressbar" aria-label="입력 완료 항목" aria-valuenow={completedCount} aria-valuemin={0} aria-valuemax={3}><span style={{ width: `${completedCount / 3 * 100}%` }} /></div></div>
-            </section>
-            <div className="guide-note"><Sparkles size={18} strokeWidth={1.7} /><div><h3>좋은 매칭은 명확한 조건에서</h3><p>브랜드에 맞는 카테고리와 예산부터<br className="desktop-break" />차근차근 설정해 보세요.</p></div></div>
-          </aside>
         </div>
 
         <footer className="page-footer"><span>creator match</span><span>브랜드와 크리에이터, 더 잘 만날 수 있도록.</span></footer>
