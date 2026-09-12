@@ -100,7 +100,7 @@
 
 ### 3.3 읽기·정제 규칙
 
-1. 파일을 문자열로 읽고 맨 앞 BOM(`﻿`)을 제거한다
+1. 파일을 문자열로 읽고 맨 앞 BOM(U+FEFF, 보이지 않는 문자)을 제거한다
 2. CRLF/LF 모두 처리한다 (CSV 파서 사용: PapaParse)
 3. 헤더 11개가 기대와 다르면 로드 실패 메시지를 화면에 표시한다
 4. 행 검증: creator_id·creator_name·category·platform 비어 있으면 건너뜀. followers, avg_view_count, engagement_rate, total_campaign_count, total_campaign_budget_krw, avg_campaign_budget_krw가 비었거나 숫자가 아니거나 음수면 건너뜀. category가 10종 밖이거나 platform이 2종 밖이면 건너뜀
