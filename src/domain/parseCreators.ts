@@ -17,7 +17,6 @@ export class CsvHeaderError extends Error {
 
 type RawRow = Record<string, string | undefined>;
 
-
 function stripBom(text: string): string {
   return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
 }

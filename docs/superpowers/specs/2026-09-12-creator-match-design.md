@@ -417,15 +417,17 @@ A = category ∈ categories 이고 tier == 입력 tier 인 사람 (예산 무시
 ## 7. 기술 구조
 
 - Vite + React 18 + TypeScript. 테스트 Vitest (+ @testing-library/react 최소 사용)
-- CSV 파싱: PapaParse
+- CSV 파싱: PapaParse (SQLite 생성 시에만 사용, L27)
 - 라우팅: 해시 라우터 (`#/`, `#/login`, `#/admin`). GitHub Pages에서 새로고침 404를 피하기 위함. 의존성 없이 `window.location.hash` 직접 처리
-- 데이터 로드: `data/dummy_creators.csv`를 Vite `?raw` import로 빌드 시 문자열 포함 → 런타임에 3.3 규칙으로 정제. (fetch·CORS 문제 없음, 원본 파일 위치는 `data/`로 의미 유지)
+- 데이터 로드 (L27): 원본 CSV는 읽기만 하며 SHA-256으로 보존을 검증한다. 실행·빌드·테스트 전에 `npm run db:build`로 `data/creators.sqlite`를 준비하고, 브라우저에서 sql.js(WASM)로 실제 SQLite 파일을 조회한다. SQLite와 WASM은 Vite가 같은 사이트의 정적 자산으로 배포한다. DB에는 원본 11개 필드와 검증 메타데이터를 저장하고 평점 공란은 SQL NULL로 보존한다. 파생값·통계·점수는 기존 규칙으로 계산한다. 로드 중 안내 및 오류 시 재시도를 제공한다.
 - 상태: React state. 운영자 비중·세션은 `localStorage` (`creator-match.weights`, `creator-match.admin-session`). 읽기·쓰기 모두 try/catch, 없으면 기본값
 - 폴더
 
 ```
 creator-match/
   data/dummy_creators.csv          # 원본 (무수정)
+  data/creators.sqlite             # 원본에서 재생성 가능한 SQLite DB
+  scripts/build-database.ts        # 원본 보존·DB 생성·일치 검증
   docs/superpowers/specs/          # 이 문서
   docs/decision-log.md
   src/
