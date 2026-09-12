@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import {
-  ArrowRight, Check, CheckCheck, ChevronDown, CircleCheck, Info,
+  ArrowRight, Check, CheckCheck, CircleCheck, Info,
   Layers3, RotateCcw, SlidersHorizontal, Sparkles, UsersRound, Wallet, X,
 } from "lucide-react";
 
@@ -30,23 +30,11 @@ export default function Home() {
   const [budget, setBudget] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [size, setSize] = useState<Size | "">("");
-  const [isOpen, setIsOpen] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [confirmed, setConfirmed] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const categoryButtonRef = useRef<HTMLButtonElement>(null);
   const numericBudget = Number(budget);
   const selectedSize = sizes.find((item) => item.id === size);
   const completedCount = Number(numericBudget > 0) + Number(selectedCategories.length > 0) + Number(Boolean(size));
-
-  useEffect(() => {
-    if (!isOpen) return;
-    function handlePointer(event: PointerEvent) {
-      if (!dropdownRef.current?.contains(event.target as Node)) setIsOpen(false);
-    }
-    document.addEventListener("pointerdown", handlePointer);
-    return () => document.removeEventListener("pointerdown", handlePointer);
-  }, [isOpen]);
 
   function updateBudget(value: string) {
     const normalized = value.replace(/,/g, "").trim();
@@ -69,7 +57,6 @@ export default function Home() {
     setSelectedCategories([]);
     setSize("");
     setErrors({});
-    setIsOpen(false);
     setConfirmed(false);
   }
 
@@ -81,9 +68,8 @@ export default function Home() {
     if (!size) nextErrors.size = "팔로워 규모를 선택해 주세요.";
     setErrors(nextErrors);
     setConfirmed(Object.keys(nextErrors).length === 0);
-    setIsOpen(false);
     if (nextErrors.budget) document.getElementById("budget")?.focus();
-    else if (nextErrors.category) categoryButtonRef.current?.focus();
+    else if (nextErrors.category) document.getElementById("category-0")?.focus();
     else if (nextErrors.size) document.getElementById("size-nano")?.focus();
   }
 
@@ -147,46 +133,19 @@ export default function Home() {
                 <div className="form-section">
                   <div className="label-row"><span className="field-label" id="category-label">카테고리 <span>*</span></span><span className="optional-tag">여러 개 선택 가능</span></div>
                   <p className="field-description" id="category-description">브랜드나 제품과 관련된 카테고리를 선택해 주세요.</p>
-                  <div
-                    className="category-dropdown" ref={dropdownRef}
-                    onKeyDown={(event) => {
-                      if (event.key === "Escape" && isOpen) { event.preventDefault(); setIsOpen(false); categoryButtonRef.current?.focus(); }
-                    }}
-                    onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsOpen(false); }}
-                  >
-                    <button
-                      type="button" id="category-trigger" ref={categoryButtonRef}
-                      className={`category-trigger ${isOpen ? "is-open" : ""} ${errors.category ? "has-error" : ""}`}
-                      aria-expanded={isOpen} aria-controls="category-options" aria-labelledby="category-label category-value"
-                      aria-invalid={Boolean(errors.category)} aria-describedby={`category-description${errors.category ? " category-error" : ""}`}
-                      onClick={() => setIsOpen(!isOpen)}
-                      onKeyDown={(event) => {
-                        if (event.key === "ArrowDown") {
-                          event.preventDefault(); setIsOpen(true);
-                          requestAnimationFrame(() => document.querySelector<HTMLInputElement>("#category-options input")?.focus());
-                        }
-                      }}
-                    >
-                      <span id="category-value" className={selectedCategories.length ? "" : "placeholder"}>{selectedCategories.length ? `${selectedCategories.join(", ")}` : "카테고리를 선택해 주세요"}</span>
-                      <ChevronDown size={19} aria-hidden="true" />
-                    </button>
-                    {isOpen && (
-                      <div id="category-options" className="dropdown-panel" role="group" aria-labelledby="category-label">
-                        <div className="dropdown-heading"><span>카테고리 선택</span><span>{selectedCategories.length}개 선택</span></div>
-                        <div className="category-options">
-                          {categories.map((category) => (
-                            <label className={`category-option ${selectedCategories.includes(category) ? "is-selected" : ""}`} key={category}>
-                              <input type="checkbox" checked={selectedCategories.includes(category)} onChange={() => toggleCategory(category)} />
-                              <span className="custom-checkbox" aria-hidden="true">{selectedCategories.includes(category) && <Check size={12} strokeWidth={3} />}</span>
-                              <span>{category}</span>
-                            </label>
-                          ))}
-                        </div>
-                        <div className="dropdown-footer"><button type="button" onClick={() => { setSelectedCategories([]); setConfirmed(false); }}>선택 해제</button><button type="button" onClick={() => { setIsOpen(false); categoryButtonRef.current?.focus(); }}>선택 완료 <Check size={14} /></button></div>
-                      </div>
-                    )}
+                  <div className="category-buttons" role="group" aria-labelledby="category-label" aria-describedby={`category-description${errors.category ? " category-error" : ""}`}>
+                    {categories.map((category, index) => (
+                      <button
+                        key={category} id={`category-${index}`} type="button"
+                        className={`category-button ${selectedCategories.includes(category) ? "is-selected" : ""} ${errors.category ? "has-error" : ""}`}
+                        aria-pressed={selectedCategories.includes(category)}
+                        onClick={() => toggleCategory(category)}
+                      >
+                        <span className="category-check" aria-hidden="true">{selectedCategories.includes(category) && <Check size={12} strokeWidth={2.5} />}</span>
+                        {category}
+                      </button>
+                    ))}
                   </div>
-                  {selectedCategories.length > 0 && <div className="selected-tags" aria-label="선택한 카테고리">{selectedCategories.map((category) => <span className="selected-tag" key={category}>{category}<button type="button" aria-label={`${category} 선택 해제`} onClick={() => toggleCategory(category)}><X size={13} /></button></span>)}</div>}
                   {errors.category && <p className="field-error" id="category-error">{errors.category}</p>}
                 </div>
 
