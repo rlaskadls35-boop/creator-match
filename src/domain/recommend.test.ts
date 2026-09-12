@@ -33,7 +33,7 @@ describe('filterCandidates (설계 §5.1)', () => {
     expect(fresh.map((c) => c.id)).toContain('C0036');
     expect(filterNewCandidates(all, { ...Q, budget: 1 })).toEqual(fresh);
     expect(fresh.every((c) => !c.hasHistory && Q.categories.includes(c.category) && c.tier === Q.tier)).toBe(true);
-    expect(sortNewCandidates(fresh, 'views')[0].avgViewCount).toBe(Math.max(...fresh.map((c) => c.avgViewCount)));
+    expect(sortNewCandidates(fresh, { key: 'views', direction: 'desc' })[0].avgViewCount).toBe(Math.max(...fresh.map((c) => c.avgViewCount)));
   });
 });
 

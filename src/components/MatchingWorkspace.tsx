@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { DatasetStats, ScoredCreator, Weights } from '../domain/types';
 import { matchScore, rankCreators } from '../domain/scoring';
-import { filterCandidates, sortCandidates, applyResultFilters, DEFAULT_SORT, DEFAULT_FILTERS, SORT_DEFAULT_DIRECTION, filterNewCandidates, sortNewCandidates } from '../domain/recommend';
-import type { SearchInput, SortKey, SortState, ResultFilters, NewCandidateSortKey } from '../domain/recommend';
+import { filterCandidates, sortCandidates, applyResultFilters, DEFAULT_SORT, DEFAULT_NEW_SORT, DEFAULT_FILTERS, SORT_DEFAULT_DIRECTION, filterNewCandidates, sortNewCandidates } from '../domain/recommend';
+import type { SearchInput, SortKey, SortState, ResultFilters, NewCandidateSortKey, NewCandidateSortState } from '../domain/recommend';
 import { nearCandidates, buildRelaxations, FEW_RESULTS_THRESHOLD } from '../domain/recommend';
 import { EMPTY_FORM, toSearchInput } from '../domain/searchForm';
 import type { SearchFormState } from '../domain/searchForm';
@@ -34,7 +34,7 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
   const [query, setQuery] = useState<SearchInput | null>(null);
   const [sort, setSort] = useState<SortState>(DEFAULT_SORT);
   const [filters, setFilters] = useState<ResultFilters>(DEFAULT_FILTERS);
-  const [newSort, setNewSort] = useState<NewCandidateSortKey>('engagement');
+  const [newSort, setNewSort] = useState<NewCandidateSortState>(DEFAULT_NEW_SORT);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const candidates = useMemo(() => (query ? filterCandidates(ranked, query) : []), [ranked, query]);
@@ -72,7 +72,7 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
     setSort(DEFAULT_SORT);
     setFilters(DEFAULT_FILTERS);
     setExpandedId(null);
-    setNewSort('engagement');
+    setNewSort(DEFAULT_NEW_SORT);
   };
   const handleSubmit = () => {
     const input = toSearchInput(form);
@@ -84,6 +84,8 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
   };
   const handleSort = (key: SortKey) =>
     setSort((s) => (s.key === key ? { key, direction: s.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: SORT_DEFAULT_DIRECTION[key] }));
+  const handleNewSort = (key: NewCandidateSortKey) =>
+    setNewSort((s) => (s.key === key ? { key, direction: s.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: 'desc' }));
   const toggleExpand = (id: string) => setExpandedId((cur) => (cur === id ? null : id));
 
   return (
@@ -118,7 +120,7 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
                 priorRankById={priorRankById}
               />
             )}
-            {!filters.historyOnly && <NewCandidatesTable rows={visibleNew} stats={stats} sortKey={newSort} onSortChange={setNewSort} />}
+            {!filters.historyOnly && <NewCandidatesTable rows={visibleNew} sort={newSort} onSortChange={handleNewSort} />}
             {fewRelaxations && (
               <RelaxationList compact title="이력이 있는 후보가 적습니다. 조건을 넓히면 더 볼 수 있습니다." items={fewRelaxations} onRelax={handleRelax} />
             )}
