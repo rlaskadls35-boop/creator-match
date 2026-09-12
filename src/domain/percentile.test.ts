@@ -17,12 +17,14 @@ describe('percentileRanks (설계 §5.4)', () => {
     expect(r[1].rank).toBe(2);
     expect(r[2].rank).toBe(2);
     expect(r.map((x) => x.tied)).toEqual([false, true, true, false]);
+    expect(r.map((x) => x.tieCount)).toEqual([0, 1, 1, 0]);
   });
   it('집단이 1명이면 50점', () => {
     const [r] = percentileRanks([42], true);
     expect(r.score).toBe(50);
     expect(r.topPercent).toBe(50);
     expect(r.rank).toBe(1);
+    expect(r.tieCount).toBe(0);
   });
   it('낮을수록 좋음(비용)은 방향이 뒤집힌다', () => {
     const r = percentileRanks([10, 20, 30], false);
