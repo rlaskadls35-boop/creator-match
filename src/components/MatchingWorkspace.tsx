@@ -4,7 +4,7 @@ import type { DatasetStats, ScoredCreator, Weights } from '../domain/types';
 import { matchScore, rankCreators } from '../domain/scoring';
 import { filterCandidates, sortCandidates, applyResultFilters, DEFAULT_SORT, DEFAULT_FILTERS, SORT_DEFAULT_DIRECTION, filterNewCandidates, sortNewCandidates } from '../domain/recommend';
 import type { SearchInput, SortKey, SortState, ResultFilters, NewCandidateSortKey } from '../domain/recommend';
-import { diagnoseZeroResult, buildRelaxations, FEW_RESULTS_THRESHOLD } from '../domain/recommend';
+import { nearCandidates, buildRelaxations, FEW_RESULTS_THRESHOLD } from '../domain/recommend';
 import { EMPTY_FORM, toSearchInput } from '../domain/searchForm';
 import type { SearchFormState } from '../domain/searchForm';
 import { fromSearchInput } from '../domain/searchForm';
@@ -12,7 +12,7 @@ import { SearchPanel } from './SearchPanel';
 import { ResultsToolbar } from './ResultsToolbar';
 import { ResultsTable } from './ResultsTable';
 import { NewCandidatesTable } from './NewCandidatesTable';
-import { ZeroResults } from './ZeroResults';
+import { NearCandidatesTable } from './NearCandidatesTable';
 import { RelaxationList } from './RelaxationList';
 import { ConditionSummary } from './ConditionSummary';
 
@@ -45,7 +45,9 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
   const newCandidates = useMemo(() => query ? filterNewCandidates(creators, query) : [], [creators, query]);
   const visibleNew = useMemo(() => sortNewCandidates(applyResultFilters(newCandidates, filters), newSort), [newCandidates, filters, newSort]);
   // 0명 판정은 결과 필터(플랫폼·이력) 적용 전 인원으로 (설계 §5.1)
-  const zeroInfo = useMemo(() => (query && candidates.length === 0 ? diagnoseZeroResult(ranked, query) : null), [ranked, query, candidates]);
+  const isZero = query !== null && candidates.length === 0;
+  // 후보 0명일 때는 조건 하나만 다른 근접 후보만 보여 준다 (L25: 진단 문단·완화 버튼 제거)
+  const near = useMemo(() => (query && isZero ? nearCandidates(ranked, query) : []), [ranked, query, isZero]);
   const fewRelaxations = useMemo(
     () => (query && candidates.length > 0 && candidates.length < FEW_RESULTS_THRESHOLD ? buildRelaxations(ranked, query) : null),
     [ranked, query, candidates],
@@ -99,8 +101,12 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
           <>
             <ResultsToolbar count={visible.length} filters={filters} onChange={setFilters} sort={sort} onSortChange={handleSort} />
             <p className="results__context">과거 평균 단가가 입력 예산 이내인 후보입니다. 캠페인 건수는 참고 정보로 표시합니다.</p>
-            {zeroInfo ? (
-              <ZeroResults info={zeroInfo} stats={stats} onRelax={handleRelax} />
+            {isZero ? (
+              near.length > 0 ? (
+                <NearCandidatesTable items={near} stats={stats} />
+              ) : (
+                <p className="results__empty">조건에 가까운 크리에이터도 없습니다. 예산·규모·카테고리를 바꿔 다시 찾아 보세요.</p>
+              )
             ) : visible.length === 0 ? (
               <p className="results__empty">선택한 필터에 맞는 크리에이터가 없습니다. 필터를 풀어 보세요.</p>
             ) : (
