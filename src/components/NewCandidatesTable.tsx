@@ -10,9 +10,9 @@ interface Props {
 }
 
 const SORTABLE: { key: NewCandidateSortKey; heading: string }[] = [
-  { key: 'followers', heading: '팔로워수' },
   { key: 'views', heading: '평균\n조회수' },
   { key: 'engagement', heading: '참여율' },
+  { key: 'followers', heading: '팔로워수' },
 ];
 
 export function NewCandidatesTable({ rows, sort, onSortChange }: Props) {
@@ -53,9 +53,9 @@ export function NewCandidatesTable({ rows, sort, onSortChange }: Props) {
                   </td>
                   <td className="table__text" data-label="플랫폼">{c.platform}</td>
                   <td className="table__text" data-label="카테고리">{c.category}</td>
-                  <td className="table__num" data-label="팔로워 수">{formatInt(c.followers)}명</td>
                   <td className="table__num" data-label="평균 조회수">{formatInt(c.avgViewCount)}회</td>
                   <td className="table__num" data-label="참여율">{formatPercent(c.engagementRate)}</td>
+                  <td className="table__num" data-label="팔로워 수">{formatInt(c.followers)}명</td>
                 </tr>
               ))}
             </tbody>

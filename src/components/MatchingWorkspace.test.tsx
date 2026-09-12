@@ -75,7 +75,7 @@ describe('기존 후보와 신규 후보 분리', () => {
     expect(within(fresh).getByText('지수챌린지36')).toBeInTheDocument();
     expect(within(fresh).queryByRole('columnheader', { name: '매칭 점수' })).not.toBeInTheDocument();
     expect(within(fresh).getAllByRole('columnheader').map((h) => h.getAttribute('aria-label') ?? h.textContent?.replace(/\s+/g, ' ').replace(/[▲▼↕]/g, '').trim()))
-      .toEqual(['크리에이터', '플랫폼', '카테고리', '팔로워 수', '평균 조회수', '참여율']);
+      .toEqual(['크리에이터', '플랫폼', '카테고리', '평균 조회수', '참여율', '팔로워 수']);
     expect(screen.queryByText('채널 지표로 살펴보기')).not.toBeInTheDocument();
     expect(screen.queryByText(/예상 평점/)).not.toBeInTheDocument();
     expect(screen.queryByText(/예상 4/)).not.toBeInTheDocument();
