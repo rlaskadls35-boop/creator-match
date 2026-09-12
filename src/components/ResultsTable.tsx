@@ -106,7 +106,7 @@ export function ResultsTable({
                   <td className="table__num" data-label="누적 캠페인">{c.totalCampaignCount}건</td>
                   <td className="table__num" data-label="광고주 평점">{formatRating(c.rating)} / 5</td>
                   <td className="table__num table__rate" data-label="1건 평균 단가">{formatInt(c.rate)}원</td>
-                  <td className="table__num" data-label="1조회당 비용">{formatCostPerView(c.costPerView)}/회</td>
+                  <td className="table__num" data-label="1조회당 비용">{formatCostPerView(c.costPerView)}</td>
                   <td className="table__action">
                     <button
                       type="button"

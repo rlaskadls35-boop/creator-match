@@ -127,8 +127,15 @@ button { font: inherit; }
 .table-wrap { background: var(--card); border-radius: var(--radius-card); box-shadow: var(--shadow); min-height: 210px; }
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .table th { text-align: center; font-size: 13px; color: var(--text-muted); font-weight: 500; padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; word-break: keep-all; }
-.table th .th__head { display: flex; align-items: center; justify-content: center; gap: 2px; }
-.table th .sort-btn { text-align: center; align-items: center; justify-content: center; }
+/* 제목 양옆에 같은 폭을 두어 아이콘과 무관하게 글자 중심을 데이터에 맞춘다. */
+.table th .th__head { --head-icon: 12px; --head-gap: 2px; display: inline-grid; grid-template-columns: var(--head-icon) max-content var(--head-icon); column-gap: var(--head-gap); align-items: center; }
+.table th .sort-btn { display: grid; grid-template-columns: var(--head-icon) max-content var(--head-icon); column-gap: var(--head-gap); grid-column: 1 / -1; grid-row: 1; text-align: center; align-items: center; justify-content: center; }
+.table th .sort-btn .th__label { grid-column: 2; }
+.table th .sort-btn__arrow { grid-column: 3; display: inline-flex; align-items: center; justify-content: center; width: var(--head-icon); height: var(--head-icon); font-size: 9px; line-height: 1; }
+.table th .th__head:has(.tip) .sort-btn__arrow { transform: translateY(calc((var(--head-icon) + 2px) / 2)); }
+.table th .th__head .tip { grid-column: 3; grid-row: 1; align-self: center; justify-self: center; margin: 0; transform: translateY(calc((var(--head-icon) + 2px) / -2)); }
+.table th .tip__trigger { display: inline-flex; align-items: center; justify-content: center; width: var(--head-icon); height: var(--head-icon); padding: 0; font-size: 11px; }
+.table th .th__head .tip__bubble { top: calc(100% + var(--head-icon) + 10px); bottom: auto; }
 .th__label { display: inline-block; white-space: pre; line-height: 1.45; }
 .table td { padding: 13px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; transition: background .15s ease; white-space: nowrap; }
 .table > tbody > tr:not(.explain-row) > td { text-align: center; }
@@ -286,20 +293,17 @@ html, body { overflow-x: hidden; }
   .weights__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (min-width: 768px) and (max-width: 1200px) {
-  /* 두 줄 제목 옆에서 설명 아이콘은 위, 정렬 화살표는 아래에 배치한다. */
-  .table th .th__head { display: inline-flex; gap: 0; }
-  .table th .sort-btn { gap: 2px; }
-  .table th .th__head:has(.tip) { position: relative; }
-  .table th .th__head:has(.tip) .sort-btn { padding-right: 16px; }
-  .table th .th__head:has(.tip) .sort-btn__arrow { position: absolute; right: 0; bottom: 0; width: 14px; }
-  .table th .th__head .tip { position: absolute; top: 0; right: 0; margin: 0; }
-  .table th .tip__trigger { width: 14px; padding: 0; font-size: 12px; }
+  .table > thead > tr > th { padding-inline: 0; }
+  .table th .th__head { --head-icon: 10px; --head-gap: 0px; }
+  .table th .th__head:not(:has(.tip)) { --head-icon: 8px; }
+  .table th .tip__trigger { font-size: 10px; }
+  .table th .sort-btn__arrow { font-size: 8px; }
   .table--ranked > thead > tr > th:first-child { width: 4%; }
-  .table--ranked > thead > tr > th:nth-child(2) { width: 11%; }
-  .table--ranked > thead > tr > th:nth-child(8) { width: 6%; }
-  .table--ranked > thead > tr > th:nth-child(9) { width: 8%; }
+  .table--ranked > thead > tr > th:nth-child(2) { width: 10%; }
+  .table--ranked > thead > tr > th:nth-child(8) { width: 7%; }
+  .table--ranked > thead > tr > th:nth-child(9) { width: 9%; }
   .table--ranked > thead > tr > th:nth-child(11) { width: 10%; }
-  .table--ranked > thead > tr > th:nth-child(12) { width: 9%; }
+  .table--ranked > thead > tr > th:nth-child(12) { width: 9.5%; }
 }
 @media (max-width: 900px) {
   /* 계산 내역은 열이 많아 먼저 접는다 */
