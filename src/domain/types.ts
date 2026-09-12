@@ -42,6 +42,8 @@ export interface MetricScore {
   /** 집단 안 등수, 1부터 */
   rank: number;
   groupSize: number;
+  /** 같은 값이 한 명 이상 더 있으면 공동 등수 */
+  tied: boolean;
   /** '나노' | '마이크로' | '매크로' | '전체' */
   groupLabel: string;
 }

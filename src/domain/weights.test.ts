@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  DEFAULT_WEIGHTS, WEIGHTS_STORAGE_KEY, sumWeights, validateWeights, normalizeWeights,
+  DEFAULT_WEIGHTS, WEIGHTS_STORAGE_KEY, sumWeights, validateWeights,
   weightsSumIs100, loadWeights, saveWeights,
+  toDraft, draftSum, draftInRange, draftToWeights, draftEquals,
 } from './weights';
 
 describe('weights (설계 §5.5, §6.4)', () => {
@@ -21,11 +22,30 @@ describe('weights (설계 §5.5, §6.4)', () => {
     expect(validateWeights({ engagement: 100 })).toBe(false);
   });
 
-  it('normalizeWeights는 비율을 유지하며 합을 100으로 맞춘다', () => {
-    const n = normalizeWeights({ ...DEFAULT_WEIGHTS, engagement: 40 }); // 합 110
-    expect(weightsSumIs100(n)).toBe(true);
-    expect(n.engagement).toBeCloseTo((40 / 110) * 100, 6);
-    expect(normalizeWeights({ engagement: 0, views: 0, rating: 0, costPerView: 0, campaigns: 0 })).toEqual(DEFAULT_WEIGHTS);
+  it('입력 중인 비중(draft): 합이 정확히 100일 때만 실제 비중이 된다 (L23)', () => {
+    const draft = toDraft(DEFAULT_WEIGHTS);
+    expect(draftSum(draft)).toBe(100);
+    expect(draftToWeights(draft)).toEqual(DEFAULT_WEIGHTS);
+    expect(weightsSumIs100(draftToWeights(draft)!)).toBe(true);
+    expect(draftEquals(draft, DEFAULT_WEIGHTS)).toBe(true);
+
+    const over = { ...draft, engagement: 40 }; // 합 110
+    expect(draftSum(over)).toBe(110);
+    expect(draftToWeights(over)).toBeNull();
+    expect(draftEquals(over, DEFAULT_WEIGHTS)).toBe(false);
+  });
+
+  it('빈 칸은 0으로 세지만 유효하지 않다', () => {
+    const empty = { ...toDraft(DEFAULT_WEIGHTS), views: null };
+    expect(draftSum(empty)).toBe(75);
+    expect(draftInRange(empty)).toBe(false);
+    expect(draftToWeights(empty)).toBeNull();
+  });
+
+  it('0~100 범위를 벗어나거나 정수가 아니면 유효하지 않다', () => {
+    expect(draftInRange({ ...toDraft(DEFAULT_WEIGHTS), engagement: 120, views: -20 })).toBe(false);
+    expect(draftInRange({ ...toDraft(DEFAULT_WEIGHTS), engagement: 30.5, views: 24.5 })).toBe(false);
+    expect(draftInRange(toDraft(DEFAULT_WEIGHTS))).toBe(true);
   });
 
   it('저장 → 읽기 왕복', () => {

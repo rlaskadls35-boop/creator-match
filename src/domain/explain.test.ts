@@ -52,8 +52,19 @@ describe('metricBars (설계 §5.8)', () => {
   it('5개, 항목 순서, 정수 점수, "{집단} {인원}명 중 {등수}등"', () => {
     const bars = metricBars(byId('C0180'));
     expect(bars.map((b) => b.key)).toEqual(['engagement', 'views', 'rating', 'costPerView', 'campaigns']);
-    expect(bars[0]).toEqual({ key: 'engagement', label: '참여율', score: 59, rankText: '마이크로 129명 중 53등' });
-    expect(bars[2]).toEqual({ key: 'rating', label: '광고주 평점', score: 75, rankText: '전체 200명 중 46등' });
-    expect(bars[4].rankText).toBe('전체 200명 중 10등');
+    expect(bars[1]).toEqual({ key: 'views', label: '평균 조회수', score: 53, rankText: '마이크로 129명 중 61등' });
+    expect(bars[3].rankText).toBe('마이크로 129명 중 38등');
+  });
+
+  it('같은 값이 여러 명이면 공동 등수로 밝힌다 (L23)', () => {
+    const bars = metricBars(byId('C0180'));
+    // 참여율 6.6%·평점 4.6점은 동점자가 있다
+    expect(bars[0]).toEqual({ key: 'engagement', label: '참여율', score: 59, rankText: '마이크로 129명 중 공동 53등' });
+    expect(bars[2]).toEqual({ key: 'rating', label: '광고주 평점', score: 75, rankText: '전체 200명 중 공동 46등' });
+  });
+
+  it('캠페인 이력이 없으면 0건 집단의 공동 등수 (지수챌린지36)', () => {
+    const bars = metricBars(byId('C0036'));
+    expect(bars[4].rankText).toBe('전체 200명 중 공동 174등');
   });
 });

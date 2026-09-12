@@ -1,0 +1,111 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { AdminPage } from './AdminPage';
+import { loadDataset } from './dataset';
+import { SESSION_KEY } from './session';
+
+const data = loadDataset();
+
+/** 제안서와 같은 조건: 1명당 50만 원 · 뷰티 · 나노 → 3명 */
+async function searchThree(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(screen.getByLabelText('크리에이터 1명당 섭외 예산'), '500000');
+  await user.click(screen.getByRole('button', { name: '뷰티' }));
+  await user.click(screen.getByRole('radio', { name: /나노/ }));
+  await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
+  expect(await screen.findByText('섭외 가능한 크리에이터 3명')).toBeInTheDocument();
+}
+
+describe('운영자 비중 화면 (개선안 L23)', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    localStorage.setItem(SESSION_KEY, '1');
+  });
+
+  it('합계가 100이 아닌 동안에는 미리보기가 멈추고, 100을 맞추면 갱신된다', async () => {
+    if (!data.ok) throw new Error('데이터 로드 실패');
+    render(<AdminPage data={data} />);
+    const user = userEvent.setup();
+    await searchThree(user);
+
+    expect(screen.getByText('미리보기 조건')).toBeInTheDocument();
+    expect(screen.getByText('저장된 기준')).toBeInTheDocument();
+    expect(screen.getByText('저장된 비중으로 계산')).toBeInTheDocument();
+    const before = screen.getAllByRole('row')[1].textContent;
+
+    // 참여율 30 → 40 (합계 110)
+    const engagement = screen.getByLabelText('참여율 비중 (%)');
+    await user.clear(engagement);
+    await user.type(engagement, '40');
+
+    expect(screen.getByText('합계 110% / 100%')).toBeInTheDocument();
+    expect(screen.getByText('10% 초과 · 비중을 낮춰 100%를 맞추세요.')).toBeInTheDocument();
+    expect(screen.getByText('미리보기 갱신 대기 · 마지막 100% 기준의 결과')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '비중 저장' })).toBeDisabled();
+    expect(screen.getAllByRole('row')[1].textContent).toBe(before); // 결과는 그대로
+
+    // 평균 조회수 25 → 15 (합계 100)
+    const views = screen.getByLabelText('평균 조회수 비중 (%)');
+    await user.clear(views);
+    await user.type(views, '15');
+
+    expect(screen.getByText('합계 100% / 100%')).toBeInTheDocument();
+    expect(screen.getByText('변경한 비중으로 미리보기 · 저장값과 비교')).toBeInTheDocument();
+    expect(screen.getByText('저장하지 않은 변경')).toBeInTheDocument();
+    expect(screen.getAllByRole('row')[1].textContent).not.toBe(before);
+    expect(screen.getByRole('button', { name: '비중 저장' })).toBeEnabled();
+
+    // 저장하면 다시 "저장된 기준"이 되고 저장값과의 차이가 사라진다
+    await user.click(screen.getByRole('button', { name: '비중 저장' }));
+    expect(screen.getByText('저장했습니다. 광고주 화면에 적용됩니다.')).toBeInTheDocument();
+    expect(screen.getByText('저장된 기준')).toBeInTheDocument();
+    expect(screen.getAllByText('저장값과 동일')).toHaveLength(3);
+  });
+
+  it('변경 취소를 누르면 입력과 미리보기가 저장된 값으로 돌아간다', async () => {
+    if (!data.ok) throw new Error('데이터 로드 실패');
+    render(<AdminPage data={data} />);
+    const user = userEvent.setup();
+    await searchThree(user);
+    const before = screen.getAllByRole('row')[1].textContent;
+
+    const engagement = screen.getByLabelText('참여율 비중 (%)');
+    await user.clear(engagement);
+    await user.type(engagement, '10');
+    const campaigns = screen.getByLabelText('캠페인 건수 비중 (%)');
+    await user.clear(campaigns);
+    await user.type(campaigns, '30');
+    expect(screen.getAllByRole('row')[1].textContent).not.toBe(before);
+
+    await user.click(screen.getByRole('button', { name: '변경 취소' }));
+    expect(engagement).toHaveValue(30);
+    expect(screen.getAllByRole('row')[1].textContent).toBe(before);
+    expect(screen.getByRole('button', { name: '변경 취소' })).toBeDisabled();
+  });
+
+  it('계산 보기를 누르면 항목별 반영 비중과 합산 점수를 보여 준다', async () => {
+    if (!data.ok) throw new Error('데이터 로드 실패');
+    render(<AdminPage data={data} />);
+    const user = userEvent.setup();
+    await searchThree(user);
+
+    await user.click(screen.getByRole('button', { name: '유나매거진115 계산 내역 보기' }));
+    const panel = screen.getByLabelText('유나매거진115 매칭 점수 계산 내역');
+    expect(within(panel).getByText('매칭 점수 계산 내역')).toBeInTheDocument();
+    expect(within(panel).getByText(/합산 56.6점/)).toBeInTheDocument();
+    expect(within(panel).getByText('57점')).toBeInTheDocument();
+
+    // 참여율: 실제 7.1%, 항목 평가 43.0점, 비중 30%, 반영 12.90점
+    const rows = within(panel).getAllByRole('row');
+    expect(rows[1]).toHaveTextContent('참여율');
+    expect(rows[1]).toHaveTextContent('7.1%');
+    expect(rows[1]).toHaveTextContent('43.0점');
+    expect(rows[1]).toHaveTextContent('30%');
+    expect(rows[1]).toHaveTextContent('12.90점');
+
+    // 평점은 이력이 없어 예상값으로 계산한다는 근거를 함께 보여 준다
+    expect(within(panel).getByText('계산에는 예상 평점 4.42점 사용')).toBeInTheDocument();
+    // 캠페인 0건 행은 왜 6.5점인지 설명을 단다
+    expect(within(panel).getByText('캠페인 0건인데 항목 평가가 6.5점인 이유')).toBeInTheDocument();
+  });
+});

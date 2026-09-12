@@ -1,5 +1,5 @@
 import { METRIC_KEYS } from './types';
-import type { MetricKey, ScoredCreator } from './types';
+import type { MetricKey, MetricScore, ScoredCreator } from './types';
 import { METRIC_LABEL } from './weights';
 import { displayTopPercent } from './percentile';
 import { formatCompact, formatCostPerView, formatPercent, formatRating } from './format';
@@ -59,10 +59,15 @@ export function cautions(c: ScoredCreator): Caution[] {
     .map((k) => ({ key: k, text: `${SUBJECT[k]} ${c.metrics[k].groupLabel} 중 하위권입니다 (${RAW_VALUE[k](c)})` }));
 }
 
+/** "{집단} {인원}명 중 {등수}등". 동점이 있으면 공동 등수임을 밝힌다 (L23) */
+export function rankText(m: MetricScore): string {
+  return `${m.groupLabel} ${m.groupSize}명 중 ${m.tied ? '공동 ' : ''}${m.rank}등`;
+}
+
 /** 항목 점수 막대 5개. 비중은 넣지 않는다 (설계 D10, D25) */
 export function metricBars(c: ScoredCreator): MetricBar[] {
   return METRIC_KEYS.map((k) => {
     const m = c.metrics[k];
-    return { key: k, label: METRIC_LABEL[k], score: Math.round(m.score), rankText: `${m.groupLabel} ${m.groupSize}명 중 ${m.rank}등` };
+    return { key: k, label: METRIC_LABEL[k], score: Math.round(m.score), rankText: rankText(m) };
   });
 }

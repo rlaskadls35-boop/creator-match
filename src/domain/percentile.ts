@@ -3,6 +3,8 @@ export interface PercentileResult {
   topPercent: number;
   rank: number;
   groupSize: number;
+  /** 같은 값이 한 명 이상 더 있으면 공동 등수 */
+  tied: boolean;
 }
 
 function round1(x: number): number {
@@ -24,7 +26,7 @@ export function percentileRanks(values: number[], higherIsBetter: boolean): Perc
       else if (higherIsBetter ? o > v : o < v) better += 1;
     }
     const topPercent = n <= 1 ? 50 : ((better + ties / 2) / (n - 1)) * 100;
-    return { score: round1(100 - topPercent), topPercent, rank: better + 1, groupSize: n };
+    return { score: round1(100 - topPercent), topPercent, rank: better + 1, groupSize: n, tied: ties > 0 };
   });
 }
 

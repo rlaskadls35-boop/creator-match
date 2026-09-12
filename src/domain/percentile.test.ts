@@ -16,6 +16,7 @@ describe('percentileRanks (설계 §5.4)', () => {
     expect(r[2].score).toBe(50);
     expect(r[1].rank).toBe(2);
     expect(r[2].rank).toBe(2);
+    expect(r.map((x) => x.tied)).toEqual([false, true, true, false]);
   });
   it('집단이 1명이면 50점', () => {
     const [r] = percentileRanks([42], true);

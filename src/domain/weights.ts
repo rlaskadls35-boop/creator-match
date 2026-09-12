@@ -14,6 +14,15 @@ export const METRIC_LABEL: Record<MetricKey, string> = {
   campaigns: '캠페인 건수',
 };
 
+/** 비중을 올리면 어떤 크리에이터가 위로 오는지 한 줄 설명 (운영자 화면, L23) */
+export const METRIC_HINT: Record<MetricKey, string> = {
+  engagement: '반응이 높은 채널을 우선',
+  views: '조회수가 높은 채널을 우선',
+  rating: '평가가 좋은 채널을 우선',
+  costPerView: '조회당 비용이 낮은 채널을 우선',
+  campaigns: '진행 경험이 많은 채널을 우선',
+};
+
 export function sumWeights(w: Weights): number {
   return METRIC_KEYS.reduce((s, k) => s + w[k], 0);
 }
@@ -35,13 +44,38 @@ export function weightsSumIs100(w: Weights): boolean {
   return METRIC_KEYS.every((k) => w[k] >= 0) && Math.abs(sumWeights(w) - 100) < 1e-6;
 }
 
-/** 합이 100이 아닌 비중을 비율로 환산 (운영자 미리보기용, L21). 합이 0이면 기본값 */
-export function normalizeWeights(w: Weights): Weights {
-  const s = sumWeights(w);
-  if (s <= 0) return { ...DEFAULT_WEIGHTS };
+/**
+ * 운영자가 입력하는 중인 비중. 숫자 칸을 지우면 잠시 빈 값이 되므로 null을 허용한다 (L23)
+ */
+export type WeightsDraft = Record<MetricKey, number | null>;
+
+export function toDraft(w: Weights): WeightsDraft {
+  return { ...w };
+}
+
+/** 빈 칸은 0으로 세어 합계를 보여 준다 */
+export function draftSum(d: WeightsDraft): number {
+  return METRIC_KEYS.reduce((s, k) => s + (d[k] ?? 0), 0);
+}
+
+/** 다섯 칸이 모두 0~100 정수 (합계는 따지지 않음) */
+export function draftInRange(d: WeightsDraft): boolean {
+  return METRIC_KEYS.every((k) => {
+    const v = d[k];
+    return v !== null && Number.isInteger(v) && v >= 0 && v <= 100;
+  });
+}
+
+/** 합계가 정확히 100일 때만 실제 비중이 된다. 아니면 null (미리보기·저장 모두 보류) */
+export function draftToWeights(d: WeightsDraft): Weights | null {
+  if (!draftInRange(d) || draftSum(d) !== 100) return null;
   const out = {} as Weights;
-  for (const k of METRIC_KEYS) out[k] = (w[k] / s) * 100;
+  for (const k of METRIC_KEYS) out[k] = d[k] as number;
   return out;
+}
+
+export function draftEquals(d: WeightsDraft, w: Weights): boolean {
+  return METRIC_KEYS.every((k) => d[k] === w[k]);
 }
 
 function defaultStorage(): Storage | null {
