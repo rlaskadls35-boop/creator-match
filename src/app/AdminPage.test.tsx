@@ -15,6 +15,9 @@ async function searchThree(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('radio', { name: /나노/ }));
   await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
   expect(await screen.findByText('캠페인 이력이 있는 후보 2명')).toBeInTheDocument();
+  const firstRow = within(screen.getByRole('table', { name: '캠페인 이력이 있는 후보' })).getAllByRole('row')[1];
+  expect(firstRow).toHaveTextContent('하은챌린지104');
+  expect(firstRow.querySelector('[data-label="매칭 점수"]')).toHaveTextContent('39'); // 새 나노 집단에서 38.59점
 }
 
 async function openWeights(user: ReturnType<typeof userEvent.setup>) {

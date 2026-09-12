@@ -82,7 +82,7 @@ describe('기존 후보와 신규 후보 분리', () => {
     expect(within(fresh).getAllByRole('row')[1]).toHaveTextContent('지수챌린지36');
     await user.click(screen.getByRole('radio', { name: '유튜브' }));
     await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
-    expect(within(experienced).getAllByRole('row')).toHaveLength(7);
+    expect(within(experienced).getAllByRole('row')).toHaveLength(4);
     expect(within(fresh).getAllByRole('row')).toHaveLength(2);
     await user.click(screen.getByRole('checkbox', { name: '캠페인 이력 있는 크리에이터만' }));
     expect(screen.queryByRole('table', { name: '추가 확인이 필요한 신규 후보' })).not.toBeInTheDocument();

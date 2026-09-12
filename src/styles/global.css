@@ -100,7 +100,7 @@ button { font: inherit; }
 .tier-card:hover { border-color: var(--primary); }
 .tier-card.is-on { border-color: var(--primary); background: var(--primary-soft); }
 .tier-card__name { font-weight: 700; font-size: 14px; }
-.tier-card__range { font-size: 11.5px; color: var(--primary-deep); font-weight: 500; white-space: nowrap; }
+.tier-card__range { font-size: 11.5px; color: var(--primary-deep); font-weight: 500; white-space: normal; word-break: keep-all; }
 
 /* ── 결과 영역 ── */
 .results { margin-top: 8px; }
