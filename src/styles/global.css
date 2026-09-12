@@ -41,7 +41,7 @@ button { font: inherit; }
 .header__logo { display: inline-flex; border-radius: 11px; }
 .header__title { font-weight: 700; font-size: 20px; color: var(--primary-deep); line-height: 1.2; }
 .header__subtitle { font-size: 13px; color: var(--text-muted); }
-.header__link { font-size: 14px; color: var(--text-muted); text-decoration: none; }
+.header__link { font-size: 14px; color: var(--text-muted); text-decoration: none; transition: color .15s ease; }
 .header__link:hover { color: var(--primary); text-decoration: underline; }
 .header__account { display: flex; align-items: center; gap: 12px; }
 .header__account-name { font-size: 14px; color: var(--text-muted); }
@@ -118,6 +118,9 @@ button { font: inherit; }
 .table th.is-sorted { color: var(--primary-deep); font-weight: 700; }
 .table tbody tr.row--top td { background: var(--primary-soft); }
 .table tbody tr.row--top:hover td { background: #CFE0FC; }
+/* 표 머리글·첫 행의 ⓘ 버블은 위로 열리면 .table-wrap에 잘리므로 아래로 연다 (최종 리뷰 지적) */
+.table thead .tip__bubble,
+.table tbody tr:first-child .tip__bubble { top: calc(100% + 8px); bottom: auto; }
 .sort-btn { border: 0; background: transparent; padding: 0; cursor: pointer; color: inherit; font: inherit; display: inline-flex; align-items: center; gap: 4px; transition: color .15s ease; }
 .sort-btn:hover { color: var(--primary); }
 .sort-btn__arrow { font-size: 11px; opacity: .7; }

@@ -1,8 +1,11 @@
 import type { NearCandidate } from '../domain/recommend';
+import type { DatasetStats } from '../domain/types';
 import { formatCompact, formatPercent } from '../domain/format';
+import { Tooltip } from './Tooltip';
+import { estimatedRateTooltip } from './ResultsTable';
 
 /** 조건에 가장 가까운 크리에이터 표 (설계 §5.7 3, §6.2) */
-export function NearCandidatesTable({ items }: { items: NearCandidate[] }) {
+export function NearCandidatesTable({ items, stats }: { items: NearCandidate[]; stats: DatasetStats }) {
   return (
     <section className="near">
       <h3 className="near__title">조건에 가장 가까운 크리에이터</h3>
@@ -36,7 +39,11 @@ export function NearCandidatesTable({ items }: { items: NearCandidate[] }) {
                   <td className="table__num"><strong>{Math.round(c.matchScore)}</strong></td>
                   <td className="table__num">{formatPercent(c.engagementRate)}</td>
                   <td className="table__num">{formatCompact(c.avgViewCount)}</td>
-                  <td className="table__num">{c.hasHistory ? formatCompact(c.rate) : <span className="estimate">예상 {formatCompact(c.rate)}</span>}</td>
+                  <td className="table__num">
+                    {c.hasHistory ? formatCompact(c.rate) : (
+                      <span className="estimate">예상 {formatCompact(c.rate)}<Tooltip text={estimatedRateTooltip(c, stats)} label="예상 단가 설명" /></span>
+                    )}
+                  </td>
                   <td><span className="chip chip--change">{n.change}</span></td>
                 </tr>
               );

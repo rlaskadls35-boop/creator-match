@@ -24,6 +24,9 @@ const SORTABLE: { key: SortKey; label: string; tooltip?: string }[] = [
   { key: 'rate', label: '단가' },
 ];
 
+/** 순위·크리에이터 열 + 정렬 가능 열 + 추천 이유 열 (설계 리뷰 지적: 매직 넘버 제거) */
+const COLUMN_COUNT = 2 + SORTABLE.length + 1;
+
 /** 설계 §4 "예상 평점 툴팁" */
 export function estimatedRatingTooltip(stats: DatasetStats): string {
   return `캠페인 이력이 없어 실제 평점이 없습니다. 이력이 있는 크리에이터 ${stats.ratedCount}명의 평균 평점 ${stats.ratingAverage}점을 예상 평점으로 적용했습니다. 순위 계산에서는 캠페인 건수 0건이 반영되어 검증된 크리에이터보다 낮게 평가됩니다.`;
@@ -65,7 +68,7 @@ export function ResultsTable({ rows, sort, onSortChange, stats, expandedId, onTo
             const score = Math.round(c.matchScore);
             return (
               <Fragment key={c.id}>
-                <tr className={`${i === 0 ? 'row--top' : ''}${open ? ' is-open' : ''}`}>
+                <tr className={i === 0 ? 'row--top' : ''}>
                   <td><span className={`rank${i === 0 ? ' rank--top' : ''}`}>{i + 1}</span></td>
                   <td className="table__creator">
                     <div className="creator__name">
@@ -76,7 +79,7 @@ export function ResultsTable({ rows, sort, onSortChange, stats, expandedId, onTo
                   </td>
                   <td className="table__num">
                     <div className="score">
-                      <span className="bar bar--score"><span className="bar__fill" style={{ width: `${score}%` }} /></span>
+                      <span className="bar"><span className="bar__fill" style={{ width: `${score}%` }} /></span>
                       <strong>{score}</strong>
                     </div>
                   </td>
@@ -101,7 +104,7 @@ export function ResultsTable({ rows, sort, onSortChange, stats, expandedId, onTo
                 </tr>
                 {open && (
                   <tr className="explain-row">
-                    <td colSpan={9}><ExplainRow creator={c} /></td>
+                    <td colSpan={COLUMN_COUNT}><ExplainRow creator={c} /></td>
                   </tr>
                 )}
               </Fragment>

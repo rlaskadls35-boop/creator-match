@@ -62,7 +62,7 @@ export function MatchingWorkspace({ creators, stats, weights }: Props) {
         {query === null ? (
           <p className="results__empty">조건을 입력하고 크리에이터 찾기를 누르세요</p>
         ) : zeroInfo ? (
-          <ZeroResults info={zeroInfo} onRelax={handleRelax} />
+          <ZeroResults info={zeroInfo} stats={stats} onRelax={handleRelax} />
         ) : (
           <>
             <ResultsToolbar count={visible.length} filters={filters} onChange={setFilters} />

@@ -40,6 +40,9 @@ export function SearchPanel({ value, onChange, onSubmit }: Props) {
   const canSubmit = !errors.budget && !errors.categories && !errors.tier;
   const budgetRef = useRef<HTMLInputElement>(null);
   const caretRef = useRef<number | null>(null);
+  // 포맷 후 텍스트가 그대로여도(예: 숫자 사이에 문자를 넣은 경우) 커서 복원이 일어나도록
+  // value.budgetText가 아니라 이 값을 effect의 키로 쓴다 (최종 리뷰 지적)
+  const [caretTick, setCaretTick] = useState(0);
 
   const handleBudgetChange = (e: ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
@@ -47,6 +50,7 @@ export function SearchPanel({ value, onChange, onSubmit }: Props) {
     const digitsBefore = raw.slice(0, selectionStart).replace(/\D/g, '').length;
     const next = formatBudgetText(raw);
     caretRef.current = caretIndexForDigitsBefore(next, digitsBefore);
+    setCaretTick((t) => t + 1);
     onChange({ ...value, budgetText: next });
   };
 
@@ -55,7 +59,7 @@ export function SearchPanel({ value, onChange, onSubmit }: Props) {
       budgetRef.current.setSelectionRange(caretRef.current, caretRef.current);
       caretRef.current = null;
     }
-  }, [value.budgetText]);
+  }, [caretTick]);
 
   const toggleCategory = (c: Category) => {
     const has = value.categories.includes(c);

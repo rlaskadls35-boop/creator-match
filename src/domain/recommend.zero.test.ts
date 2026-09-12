@@ -76,7 +76,7 @@ describe('diagnoseZeroResult: 그 밖의 경우', () => {
     expect(info.nearCandidates.map((n) => n.change)).toEqual(['카테고리에 게임 추가', '규모를 나노로', '규모를 마이크로로']); // 매칭 점수 65 / 45 / 40 순
   });
 
-  it('예산 5만 원에서는 예산만 어긋난 뷰티·매크로 4명만 근접 후보가 된다', () => {
+  it('예산 5만 원에서는 예산만 어긋난 뷰티·매크로 4명 중 상위 3명이 근접 후보가 된다', () => {
     const near = nearCandidates(ranked, { budget: 50_000, categories: ['뷰티'], tier: '매크로' });
     // 예산 5만 원은 아무도 못 맞추므로, 예산만 어긋난 사람 = 뷰티·매크로 4명
     expect(near.every((n) => n.change.startsWith('예산을'))).toBe(true);
