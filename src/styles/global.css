@@ -190,7 +190,7 @@ button { font: inherit; }
 .weights__title { margin: 0 0 4px; font-size: 20px; }
 .weights__desc { margin: 0; font-size: 13.5px; color: var(--text-muted); }
 .weights__state { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
-.weights__grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; margin: 22px 0 18px; }
+.weights__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin: 22px 0 18px; }
 .weight { display: flex; flex-direction: column; min-width: 0; }
 .weight__label { font-weight: 600; font-size: 13.5px; margin-bottom: 8px; }
 .weight__number { display: flex; align-items: center; gap: 4px; }
@@ -319,4 +319,24 @@ html, body { overflow-x: hidden; }
 /* ── 동작 축소 존중 ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* 이력이 있는 후보와 신규 후보를 분리한 로컬 비교 화면 */
+.weights__scope, .results__context { color: var(--text-muted); font-size: 13px; line-height: 1.6; margin: 8px 0 16px; }
+.new-candidates { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border); }
+.new-candidates__head { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; }
+.new-candidates__eyebrow { display: block; color: var(--primary-deep); font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.new-candidates__desc { color: var(--text-muted); font-size: 13px; line-height: 1.7; margin: 10px 0 16px; }
+.new-candidates__sort { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
+.new-candidates__unknown { color: var(--text-muted); font-weight: 500; }
+.new-candidates__reference { display: block; margin-top: 5px; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.table--new { min-width: 720px; }
+@media (max-width: 767px) {
+  .table--new { min-width: 0; }
+  .table.table--new tbody tr { grid-template-columns: 1fr 1fr; gap: 14px 18px; }
+  .table.table--new tbody td { display: flex; grid-column: auto; grid-row: auto; flex-direction: column; gap: 4px; text-align: left; }
+  .table.table--new tbody td.table__creator { display: block; grid-column: 1 / -1; }
+  .table.table--new tbody td[data-label]::before { content: attr(data-label); font-size: 12px; color: var(--text-muted); }
+  .table.table--new tbody td:last-child { grid-column: 1 / -1; }
+  .new-candidates__reference { margin-top: 0; }
 }

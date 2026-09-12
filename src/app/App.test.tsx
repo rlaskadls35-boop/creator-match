@@ -19,10 +19,10 @@ describe('광고주 화면 스모크 (설계 §8)', () => {
     await user.click(screen.getByRole('radio', { name: /마이크로/ }));
     await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
 
-    expect(screen.getByText('섭외 가능한 크리에이터 18명')).toBeInTheDocument();
+    expect(screen.getByText('캠페인 이력이 있는 후보 15명')).toBeInTheDocument();
     const rows = screen.getAllByRole('row');
     expect(rows[1]).toHaveTextContent('정은매거진77');
-    expect(rows[1]).toHaveTextContent('73'); // 매칭 점수 72.6 → 73
+    expect(rows[1]).toHaveTextContent('72'); // 매칭 점수 72.6 → 73
 
     await user.click(screen.getByRole('button', { name: '정은매거진77 추천 이유 보기' }));
     expect(screen.getByText('왜 추천하나요?')).toBeInTheDocument();
@@ -33,6 +33,6 @@ describe('광고주 화면 스모크 (설계 §8)', () => {
     expect(afterSort[afterSort.length - 1]).toHaveTextContent('캠페인 이력 없음');
 
     await user.click(screen.getByRole('checkbox', { name: '캠페인 이력 있는 크리에이터만' }));
-    expect(screen.getByText('섭외 가능한 크리에이터 15명')).toBeInTheDocument();
+    expect(screen.getByText('캠페인 이력이 있는 후보 15명')).toBeInTheDocument();
   });
 });

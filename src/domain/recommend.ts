@@ -1,6 +1,6 @@
 import { CATEGORIES, TIERS } from './types';
 import type { Category, Creator, Platform, RankedCreator, Tier } from './types';
-import { compareByMatch } from './scoring';
+import { compareByMatch, hasMatchingData } from './scoring';
 import { formatWon } from './format';
 
 // ───────────── 1단계 필터 (설계 §5.1) ─────────────
@@ -13,7 +13,7 @@ export interface SearchInput {
 
 export function filterCandidates<T extends Creator>(all: T[], input: SearchInput): T[] {
   return all.filter(
-    (c) => input.categories.includes(c.category) && c.tier === input.tier && c.rate <= input.budget,
+    (c) => hasMatchingData(c) && input.categories.includes(c.category) && c.tier === input.tier && c.rate <= input.budget,
   );
 }
 
@@ -176,9 +176,22 @@ export function diagnoseZeroResult(all: RankedCreator[], input: SearchInput): Ze
   const A = all.filter((c) => input.categories.includes(c.category) && c.tier === input.tier);
   const diagnosis =
     A.length === 0
-      ? `선택한 카테고리에는 ${input.tier} 크리에이터가 없습니다.`
-      : `${input.categories.join('·')} 카테고리의 ${input.tier} 크리에이터는 ${A.length}명 있지만, 모두 단가가 예산 ${formatWon(input.budget)}을 넘습니다. 가장 낮은 단가는 ${formatWon(minRate(A) as number)}입니다.`;
+      ? `선택한 카테고리에는 ${input.tier} 이력 있는 크리에이터가 없습니다.`
+      : `${input.categories.join('·')} 카테고리의 ${input.tier} 이력 있는 크리에이터는 ${A.length}명 있지만, 모두 단가가 예산 ${formatWon(input.budget)}을 넘습니다. 가장 낮은 단가는 ${formatWon(minRate(A) as number)}입니다.`;
   const anyAffordable = all.some((c) => c.rate <= input.budget);
-  const extraNote = anyAffordable ? null : `전체 크리에이터의 최저 단가는 ${formatWon(minRate(all) as number)}입니다.`;
+  const extraNote = anyAffordable ? null : `이력 있는 크리에이터의 최저 단가는 ${formatWon(minRate(all) as number)}입니다.`;
   return { diagnosis, extraNote, relaxations: buildRelaxations(all, input), nearCandidates: nearCandidates(all, input) };
+}
+
+/** 단가가 없어 예산 통과를 판단할 수 없는 신규 후보. 카테고리·규모만 적용한다. */
+export function filterNewCandidates<T extends Creator>(all: T[], input: SearchInput): T[] {
+  return all.filter((c) => !c.hasHistory && input.categories.includes(c.category) && c.tier === input.tier);
+}
+
+export type NewCandidateSortKey = 'engagement' | 'views';
+export function sortNewCandidates<T extends Creator>(all: T[], key: NewCandidateSortKey): T[] {
+  return [...all].sort((a, b) => {
+    const primary = key === 'views' ? b.avgViewCount - a.avgViewCount : b.engagementRate - a.engagementRate;
+    return primary || b.avgViewCount - a.avgViewCount || b.engagementRate - a.engagementRate || a.id.localeCompare(b.id);
+  });
 }

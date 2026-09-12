@@ -49,7 +49,7 @@ describe('parseCreators (설계 §3.3, §3.4)', () => {
     expect(ds.stats.skippedRows).toBe(3);
   });
 
-  it('평점 공란은 null이 되고 예상 평점·예상 단가가 채워진다', () => {
+  it('신규 후보의 평점·단가·조회당 비용은 채우지 않고 null로 유지한다', () => {
     const ds = parseCreators(
       HEADER + '\n' +
       row({ advertiser_rating: '4.0', avg_campaign_budget_krw: '1000000' }) + '\n' +
@@ -59,11 +59,10 @@ describe('parseCreators (설계 §3.3, §3.4)', () => {
     const fresh = ds.creators.find((c) => c.id === 'T003')!;
     expect(fresh.advertiserRating).toBeNull();
     expect(fresh.hasHistory).toBe(false);
-    expect(fresh.ratingIsEstimated).toBe(true);
-    expect(fresh.rating).toBe(4.5); // (4.0 + 5.0) / 2
-    expect(fresh.rateIsEstimated).toBe(true);
-    expect(fresh.rate).toBe(1_200_000); // 마이크로 이력 있는 두 명의 중앙값
-    expect(fresh.costPerView).toBeCloseTo(1_200_000 / 8000, 6);
+    expect(fresh.rating).toBeNull();
+    expect(fresh.rate).toBeNull();
+    expect(ds.stats.medianRateByTier.마이크로).toBe(1_200_000);
+    expect(fresh.costPerView).toBeNull();
   });
 });
 
@@ -93,12 +92,12 @@ describe('parseCreators 실제 데이터', () => {
     expect(count('매크로')).toBe(27);
   });
 
-  it('예상 단가 = tier 중앙값 365,000 / 1,320,000 / 4,725,000, 예상 평점 = 4.42', () => {
+  it('규모별 단가 통계는 참고값으로만 보관하고 신규 개인 값에 적용하지 않는다', () => {
     expect(ds.stats.medianRateByTier).toEqual({ 나노: 365_000, 마이크로: 1_320_000, 매크로: 4_725_000 });
     expect(ds.stats.ratingAverage).toBeCloseTo(4.42, 2);
     const fresh = ds.creators.find((c) => c.id === 'C0036')!; // 지수챌린지36, 마이크로, 이력 없음
-    expect(fresh.rate).toBe(1_320_000);
-    expect(fresh.rating).toBeCloseTo(4.42, 2);
+    expect(fresh.rate).toBeNull();
+    expect(fresh.rating).toBeNull();
   });
 
   it('costPerView = rate ÷ avg_view_count (민준브이로그180: 700,000 ÷ 8,279)', () => {

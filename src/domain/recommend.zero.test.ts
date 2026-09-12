@@ -16,9 +16,9 @@ describe('diagnoseZeroResult: 뷰티 / 매크로 / 50만 (설계 §5.7, §8.7)',
     expect(filterCandidates(ranked, Q)).toHaveLength(0);
   });
 
-  it('진단 문구: 4명 있지만 모두 예산 초과, 최저 단가 301만 원', () => {
+  it('진단 문구: 이력 있는 3명 있지만 모두 예산 초과, 최저 단가 301만 원', () => {
     expect(info.diagnosis).toBe(
-      '뷰티 카테고리의 매크로 크리에이터는 4명 있지만, 모두 단가가 예산 50만 원을 넘습니다. 가장 낮은 단가는 301만 원입니다.',
+      '뷰티 카테고리의 매크로 이력 있는 크리에이터는 3명 있지만, 모두 단가가 예산 50만 원을 넘습니다. 가장 낮은 단가는 301만 원입니다.',
     );
     expect(info.extraNote).toBeNull(); // 50만으로 살 수 있는 사람이 다른 규모엔 있다
   });
@@ -30,7 +30,7 @@ describe('diagnoseZeroResult: 뷰티 / 매크로 / 50만 (설계 §5.7, §8.7)',
     expect(byId.budget.enabled).toBe(true);
     expect(byId.budget.nextInput).toEqual({ ...Q, budget: 3_010_000 });
 
-    expect(byId['tier-나노'].count).toBe(3);
+    expect(byId['tier-나노'].count).toBe(2);
     expect(byId['tier-나노'].enabled).toBe(true);
     expect(byId['tier-나노'].nextInput.tier).toBe('나노');
 
@@ -44,11 +44,11 @@ describe('diagnoseZeroResult: 뷰티 / 매크로 / 50만 (설계 §5.7, §8.7)',
     expect(byId.category.nextInput.categories).toHaveLength(10);
   });
 
-  it('근접 후보 3명: 준그램40(예산), 라이프뷰티181(예산·예상 단가), 유나매거진115(규모)', () => {
+  it('근접 후보 3명: 준그램40(예산), 하은챌린지104(규모), 하은리뷰121(규모)', () => {
     expect(info.nearCandidates).toHaveLength(3);
-    expect(info.nearCandidates.map((n) => n.creator.id)).toEqual(['C0040', 'C0181', 'C0115']);
+    expect(info.nearCandidates.map((n) => n.creator.id)).toEqual(['C0040', 'C0104', 'C0121']);
     expect(info.nearCandidates[0].change).toBe('예산을 658만 원 이상으로');
-    expect(info.nearCandidates[1].change).toBe('예산을 472만 5,000원 이상으로');
+    expect(info.nearCandidates[1].change).toBe('규모를 나노로');
     expect(info.nearCandidates[2].change).toBe('규모를 나노로');
   });
 });
@@ -56,7 +56,7 @@ describe('diagnoseZeroResult: 뷰티 / 매크로 / 50만 (설계 §5.7, §8.7)',
 describe('diagnoseZeroResult: 그 밖의 경우', () => {
   it('극단 예산 5만 원: 전체 최저 단가 문구가 붙는다', () => {
     const info = diagnoseZeroResult(ranked, { ...Q, budget: 50_000 });
-    expect(info.extraNote).toBe('전체 크리에이터의 최저 단가는 21만 원입니다.');
+    expect(info.extraNote).toBe('이력 있는 크리에이터의 최저 단가는 21만 원입니다.');
     expect(info.relaxations.find((r) => r.id === 'category')!.note).toBe('최저 단가 224만 원');
   });
 
@@ -70,7 +70,7 @@ describe('diagnoseZeroResult: 그 밖의 경우', () => {
     ];
     const small = rankCreators(scoreCreators(parseCreators(HEADER + '\n' + rows.join('\n') + '\n').creators), DEFAULT_WEIGHTS);
     const info = diagnoseZeroResult(small, { budget: 5_000_000, categories: ['뷰티'], tier: '매크로' });
-    expect(info.diagnosis).toBe('선택한 카테고리에는 매크로 크리에이터가 없습니다.');
+    expect(info.diagnosis).toBe('선택한 카테고리에는 매크로 이력 있는 크리에이터가 없습니다.');
     expect(info.relaxations.find((r) => r.id === 'budget')).toBeUndefined();
     expect(info.relaxations.find((r) => r.id === 'category')!.count).toBe(1); // 매크로게임
     expect(info.nearCandidates.map((n) => n.change)).toEqual(['카테고리에 게임 추가', '규모를 나노로', '규모를 마이크로로']); // 매칭 점수 65 / 45 / 40 순
@@ -85,13 +85,13 @@ describe('diagnoseZeroResult: 그 밖의 경우', () => {
 });
 
 describe('buildRelaxations: 후보 1~2명 (설계 §5.7 마지막)', () => {
-  it('뷰티 / 매크로 / 310만 → 후보 1명, 예산 제안은 다음 사람 472만 5,000원 → 2명', () => {
+  it('뷰티 / 매크로 / 310만 → 후보 1명, 예산 제안은 다음 사람 658만 원 → 2명', () => {
     const q: SearchInput = { budget: 3_100_000, categories: ['뷰티'], tier: '매크로' };
     const cands = filterCandidates(ranked, q);
     expect(cands).toHaveLength(1);
     expect(cands.length).toBeLessThan(FEW_RESULTS_THRESHOLD);
     const budget = buildRelaxations(ranked, q).find((r) => r.id === 'budget')!;
-    expect(budget.label).toBe('예산을 472만 5,000원으로 올리면');
+    expect(budget.label).toBe('예산을 658만 원으로 올리면');
     expect(budget.count).toBe(2);
   });
 });

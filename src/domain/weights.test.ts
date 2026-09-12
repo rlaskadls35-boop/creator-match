@@ -8,8 +8,8 @@ import {
 describe('weights (설계 §5.5, §6.4)', () => {
   beforeEach(() => localStorage.clear());
 
-  it('기본 비중은 30/25/20/15/10, 합 100', () => {
-    expect(DEFAULT_WEIGHTS).toEqual({ engagement: 30, views: 25, rating: 20, costPerView: 15, campaigns: 10 });
+  it('기본 비중은 기존 비율을 유지한 33/28/22/17, 합 100', () => {
+    expect(DEFAULT_WEIGHTS).toEqual({ engagement: 33, views: 28, rating: 22, costPerView: 17 });
     expect(sumWeights(DEFAULT_WEIGHTS)).toBe(100);
     expect(validateWeights(DEFAULT_WEIGHTS)).toBe(true);
   });
@@ -29,7 +29,7 @@ describe('weights (설계 §5.5, §6.4)', () => {
     expect(weightsSumIs100(draftToWeights(draft)!)).toBe(true);
     expect(draftEquals(draft, DEFAULT_WEIGHTS)).toBe(true);
 
-    const over = { ...draft, engagement: 40 }; // 합 110
+    const over = { ...draft, engagement: 43 }; // 합 110
     expect(draftSum(over)).toBe(110);
     expect(draftToWeights(over)).toBeNull();
     expect(draftEquals(over, DEFAULT_WEIGHTS)).toBe(false);
@@ -37,7 +37,7 @@ describe('weights (설계 §5.5, §6.4)', () => {
 
   it('빈 칸은 0으로 세지만 유효하지 않다', () => {
     const empty = { ...toDraft(DEFAULT_WEIGHTS), views: null };
-    expect(draftSum(empty)).toBe(75);
+    expect(draftSum(empty)).toBe(72);
     expect(draftInRange(empty)).toBe(false);
     expect(draftToWeights(empty)).toBeNull();
   });
@@ -49,9 +49,17 @@ describe('weights (설계 §5.5, §6.4)', () => {
   });
 
   it('저장 → 읽기 왕복', () => {
-    const w = { engagement: 50, views: 20, rating: 10, costPerView: 10, campaigns: 10 };
+    const w = { engagement: 50, views: 20, rating: 10, costPerView: 20 };
     expect(saveWeights(w)).toBe(true);
     expect(loadWeights()).toEqual(w);
+  });
+
+  it('기존 다섯 비중을 읽으면 건수를 빼고 남은 비율을 유지한다', () => {
+    localStorage.setItem(WEIGHTS_STORAGE_KEY, JSON.stringify({ engagement: 40, views: 20, rating: 20, costPerView: 10, campaigns: 10 }));
+    expect(loadWeights()).toEqual({ engagement: 45, views: 22, rating: 22, costPerView: 11 });
+    expect(JSON.parse(localStorage.getItem(WEIGHTS_STORAGE_KEY)!).campaigns).toBe(10);
+    localStorage.setItem(WEIGHTS_STORAGE_KEY, JSON.stringify({ engagement: 0, views: 0, rating: 0, costPerView: 0, campaigns: 100 }));
+    expect(loadWeights()).toEqual(DEFAULT_WEIGHTS);
   });
 
   it('저장된 값이 없거나 손상됐으면 기본값', () => {

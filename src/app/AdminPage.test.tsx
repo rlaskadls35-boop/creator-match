@@ -13,7 +13,7 @@ async function searchThree(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: '뷰티' }));
   await user.click(screen.getByRole('radio', { name: /나노/ }));
   await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
-  expect(await screen.findByText('섭외 가능한 크리에이터 3명')).toBeInTheDocument();
+  expect(await screen.findByText('캠페인 이력이 있는 후보 2명')).toBeInTheDocument();
 }
 
 describe('운영자 비중 화면 (개선안 L23)', () => {
@@ -36,7 +36,7 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     // 참여율 30 → 40 (합계 110)
     const engagement = screen.getByLabelText('참여율 비중 (%)');
     await user.clear(engagement);
-    await user.type(engagement, '40');
+    await user.type(engagement, '43');
 
     expect(screen.getByText('합계 110% / 100%')).toBeInTheDocument();
     expect(screen.getByText('10% 초과 · 비중을 낮춰 100%를 맞추세요.')).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     // 평균 조회수 25 → 15 (합계 100)
     const views = screen.getByLabelText('평균 조회수 비중 (%)');
     await user.clear(views);
-    await user.type(views, '15');
+    await user.type(views, '18');
 
     expect(screen.getByText('합계 100% / 100%')).toBeInTheDocument();
     expect(screen.getByText('변경한 비중으로 미리보기 · 저장값과 비교')).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     await user.click(screen.getByRole('button', { name: '비중 저장' }));
     expect(screen.getByText('저장했습니다. 광고주 화면에 적용됩니다.')).toBeInTheDocument();
     expect(screen.getByText('저장된 기준')).toBeInTheDocument();
-    expect(screen.getAllByText('저장값과 동일')).toHaveLength(3);
+    expect(screen.getAllByText('저장값과 동일')).toHaveLength(2);
   });
 
   it('변경 취소를 누르면 입력과 미리보기가 저장된 값으로 돌아간다', async () => {
@@ -72,40 +72,37 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     const engagement = screen.getByLabelText('참여율 비중 (%)');
     await user.clear(engagement);
     await user.type(engagement, '10');
-    const campaigns = screen.getByLabelText('캠페인 건수 비중 (%)');
+    const campaigns = screen.getByLabelText('광고주 평점 비중 (%)');
     await user.clear(campaigns);
-    await user.type(campaigns, '30');
+    await user.type(campaigns, '45');
     expect(screen.getAllByRole('row')[1].textContent).not.toBe(before);
 
     await user.click(screen.getByRole('button', { name: '변경 취소' }));
-    expect(engagement).toHaveValue(30);
+    expect(engagement).toHaveValue(33);
     expect(screen.getAllByRole('row')[1].textContent).toBe(before);
     expect(screen.getByRole('button', { name: '변경 취소' })).toBeDisabled();
   });
 
-  it('계산 보기를 누르면 항목별 반영 비중과 합산 점수를 보여 준다', async () => {
+  it('계산 내역은 네 지표만 표시하고 신규 표는 비중 변경의 영향을 받지 않는다', async () => {
     if (!data.ok) throw new Error('데이터 로드 실패');
     render(<AdminPage data={data} />);
     const user = userEvent.setup();
     await searchThree(user);
-
-    await user.click(screen.getByRole('button', { name: '유나매거진115 계산 내역 보기' }));
-    const panel = screen.getByLabelText('유나매거진115 매칭 점수 계산 내역');
-    expect(within(panel).getByText('매칭 점수 계산 내역')).toBeInTheDocument();
-    expect(within(panel).getByText(/합산 56.6점/)).toBeInTheDocument();
-    expect(within(panel).getByText('57점')).toBeInTheDocument();
-
-    // 참여율: 실제 7.1%, 항목 평가 43.0점, 비중 30%, 반영 12.90점
-    const rows = within(panel).getAllByRole('row');
-    expect(rows[1]).toHaveTextContent('참여율');
-    expect(rows[1]).toHaveTextContent('7.1%');
-    expect(rows[1]).toHaveTextContent('43.0점');
-    expect(rows[1]).toHaveTextContent('30%');
-    expect(rows[1]).toHaveTextContent('12.90점');
-
-    // 평점은 이력이 없어 예상값으로 계산한다는 근거를 함께 보여 준다
-    expect(within(panel).getByText('계산에는 예상 평점 4.42점 사용')).toBeInTheDocument();
-    // 캠페인 0건 행은 왜 6.5점인지 설명을 단다
-    expect(within(panel).getByText('캠페인 0건인데 항목 평가가 6.5점인 이유')).toBeInTheDocument();
+    expect(screen.getAllByRole('spinbutton')).toHaveLength(4);
+    expect(screen.queryByLabelText('캠페인 건수 비중 (%)')).not.toBeInTheDocument();
+    const fresh = screen.getByRole('table', { name: '추가 확인이 필요한 신규 후보' });
+    const before = fresh.textContent;
+    await user.click(screen.getByRole('button', { name: '하은챌린지104 계산 내역 보기' }));
+    const panel = screen.getByLabelText('하은챌린지104 매칭 점수 계산 내역');
+    expect(within(panel).getAllByRole('row')).toHaveLength(5);
+    expect(within(panel).queryByText(/예상 평점/)).not.toBeInTheDocument();
+    expect(within(panel).getByText(/캠페인 집행건수는 협업 경험을 참고하는 정보/)).toBeInTheDocument();
+    const engagement = screen.getByLabelText('참여율 비중 (%)');
+    await user.clear(engagement);
+    await user.type(engagement, '43');
+    const views = screen.getByLabelText('평균 조회수 비중 (%)');
+    await user.clear(views);
+    await user.type(views, '18');
+    expect(fresh.textContent).toBe(before);
   });
 });

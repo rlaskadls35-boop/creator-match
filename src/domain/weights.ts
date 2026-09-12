@@ -3,15 +3,14 @@ import type { MetricKey, Weights } from './types';
 
 export const WEIGHTS_STORAGE_KEY = 'creator-match.weights';
 
-/** 기본 비중(임시, 설계 D9). 운영자 화면 실험 후 확정값으로 바꾼다 */
-export const DEFAULT_WEIGHTS: Weights = { engagement: 30, views: 25, rating: 20, costPerView: 15, campaigns: 10 };
+/** 기존 30:25:20:15 비율을 합계 100으로 환산한 임시값. 최적 비중을 의미하지 않는다 */
+export const DEFAULT_WEIGHTS: Weights = { engagement: 33, views: 28, rating: 22, costPerView: 17 };
 
 export const METRIC_LABEL: Record<MetricKey, string> = {
   engagement: '참여율',
   views: '평균 조회수',
   rating: '광고주 평점',
   costPerView: '조회 1회당 평균 비용',
-  campaigns: '캠페인 건수',
 };
 
 /** 비중을 올리면 어떤 크리에이터가 위로 오는지 한 줄 설명 (운영자 화면, L23) */
@@ -20,14 +19,13 @@ export const METRIC_HINT: Record<MetricKey, string> = {
   views: '조회수가 높은 채널을 우선',
   rating: '평가가 좋은 채널을 우선',
   costPerView: '조회당 비용이 낮은 채널을 우선',
-  campaigns: '진행 경험이 많은 채널을 우선',
 };
 
 export function sumWeights(w: Weights): number {
   return METRIC_KEYS.reduce((s, k) => s + w[k], 0);
 }
 
-/** 저장용 검증: 다섯 항목 모두 0~100 정수이고 합이 정확히 100 */
+/** 저장용 검증: 네 항목 모두 0~100 정수이고 합이 정확히 100 */
 export function validateWeights(value: unknown): value is Weights {
   if (!value || typeof value !== 'object') return false;
   const obj = value as Record<string, unknown>;
@@ -58,7 +56,7 @@ export function draftSum(d: WeightsDraft): number {
   return METRIC_KEYS.reduce((s, k) => s + (d[k] ?? 0), 0);
 }
 
-/** 다섯 칸이 모두 0~100 정수 (합계는 따지지 않음) */
+/** 네 칸이 모두 0~100 정수 (합계는 따지지 않음) */
 export function draftInRange(d: WeightsDraft): boolean {
   return METRIC_KEYS.every((k) => {
     const v = d[k];
@@ -92,7 +90,7 @@ export function loadWeights(storage: Storage | null = defaultStorage()): Weights
     const raw = storage.getItem(WEIGHTS_STORAGE_KEY);
     if (!raw) return { ...DEFAULT_WEIGHTS };
     const parsed: unknown = JSON.parse(raw);
-    return validateWeights(parsed) ? { ...parsed } : { ...DEFAULT_WEIGHTS };
+    return validateWeights(parsed) ? { ...parsed } : migrateLegacyWeights(parsed) ?? { ...DEFAULT_WEIGHTS };
   } catch {
     return { ...DEFAULT_WEIGHTS };
   }
@@ -106,4 +104,23 @@ export function saveWeights(w: Weights, storage: Storage | null = defaultStorage
   } catch {
     return false;
   }
+}
+
+/** 기존 다섯 항목 저장값은 건수를 제외하고 나머지 비율을 유지한다. 저장은 사용자 동작 때만 한다. */
+export function migrateLegacyWeights(value: unknown): Weights | null {
+  if (!value || typeof value !== 'object') return null;
+  const obj = value as Record<string, unknown>;
+  const keys = [...METRIC_KEYS, 'campaigns'];
+  if (Object.keys(obj).length !== keys.length || keys.some((k) => typeof obj[k] !== 'number' || !Number.isInteger(obj[k]) || (obj[k] as number) < 0 || (obj[k] as number) > 100)) return null;
+  if (keys.reduce((sum, k) => sum + (obj[k] as number), 0) !== 100) return null;
+  const total = METRIC_KEYS.reduce((sum, k) => sum + (obj[k] as number), 0);
+  if (total === 0) return { ...DEFAULT_WEIGHTS };
+  const scaled = METRIC_KEYS.map((key) => ({ key, exact: (obj[key] as number) / total * 100 }));
+  const result = Object.fromEntries(scaled.map(({ key, exact }) => [key, Math.floor(exact)])) as Weights;
+  let remaining = 100 - sumWeights(result);
+  for (const item of [...scaled].sort((a, b) => (b.exact % 1) - (a.exact % 1))) {
+    if (remaining-- <= 0) break;
+    result[item.key] += 1;
+  }
+  return result;
 }

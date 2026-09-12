@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import type { DatasetStats, RankedCreator, Weights } from '../domain/types';
 import { SORT_LABEL } from '../domain/recommend';
 import type { SortKey, SortState } from '../domain/recommend';
-import { formatCompact, formatPercent, formatRating, formatWon } from '../domain/format';
+import { formatCompact, formatPercent, formatRating } from '../domain/format';
 import { Tooltip } from './Tooltip';
 import { ExplainRow } from './ExplainRow';
 import { ScoreBreakdown } from './ScoreBreakdown';
@@ -27,23 +27,13 @@ const SORTABLE: { key: SortKey; label: string; tooltip?: string }[] = [
   { key: 'match', label: '매칭 점수', tooltip: '광고주 조건에 맞는 크리에이터들을 같은 규모 안에서 비교한 종합 점수입니다. 100점 만점' },
   { key: 'engagement', label: '참여율' },
   { key: 'views', label: '평균 조회수' },
-  { key: 'campaigns', label: '캠페인' },
+  { key: 'campaigns', label: '캠페인', tooltip: '협업 경험을 참고하는 정보입니다. 매칭 점수에는 반영하지 않습니다.' },
   { key: 'rating', label: '평점' },
   { key: 'rate', label: '단가' },
 ];
 
 /** 순위·크리에이터 열 + 정렬 가능 열 + 추천 이유 열 (설계 리뷰 지적: 매직 넘버 제거) */
 const COLUMN_COUNT = 2 + SORTABLE.length + 1;
-
-/** 설계 §4 "예상 평점 툴팁" */
-export function estimatedRatingTooltip(stats: DatasetStats): string {
-  return `캠페인 이력이 없어 실제 평점이 없습니다. 이력이 있는 크리에이터 ${stats.ratedCount}명의 평균 평점 ${stats.ratingAverage}점을 예상 평점으로 적용했습니다. 순위 계산에서는 캠페인 건수 0건이 반영되어 검증된 크리에이터보다 낮게 평가됩니다.`;
-}
-
-/** 설계 §4 "예상 단가 툴팁" */
-export function estimatedRateTooltip(c: RankedCreator, stats: DatasetStats): string {
-  return `캠페인 이력이 없어 실제 단가가 없습니다. 같은 ${c.tier} 규모 크리에이터의 캠페인당 단가 중앙값 ${formatWon(stats.medianRateByTier[c.tier])}을 예상 단가로 적용했습니다.`;
-}
 
 /** 저장값 대비 점수 변화 문구. 0.05점 미만이면 "동일"로 본다 (L23) */
 export function scoreDeltaText(delta: number): string {
@@ -52,14 +42,14 @@ export function scoreDeltaText(delta: number): string {
 }
 
 export function ResultsTable({
-  rows, sort, onSortChange, stats, expandedId, onToggleExpand,
+  rows, sort, onSortChange, expandedId, onToggleExpand,
   variant = 'advertiser', weights, savedScoreById, priorRankById,
 }: Props) {
   const admin = variant === 'admin';
   const rankHeader = sort.key === 'match' ? '순위' : `순위 (${SORT_LABEL[sort.key]} 기준)`;
   return (
     <div className="table-wrap">
-      <table className={`table${admin ? ' table--admin' : ''}`}>
+      <table aria-label="캠페인 이력이 있는 후보" className={`table${admin ? ' table--admin' : ''}`}>
         <thead>
           <tr>
             <th scope="col">{rankHeader}</th>
@@ -73,7 +63,7 @@ export function ResultsTable({
                     {col.label}
                     <span className="sort-btn__arrow" aria-hidden="true">{active ? (sort.direction === 'asc' ? '▲' : '▼') : '↕'}</span>
                   </button>
-                  {col.tooltip && <Tooltip text={col.tooltip} label="매칭 점수 설명" />}
+                  {col.tooltip && <Tooltip text={col.tooltip} label={`${col.label} 설명`} />}
                 </th>
               );
             })}
@@ -114,14 +104,10 @@ export function ResultsTable({
                   <td className="table__num" data-label="평균 조회수">{formatCompact(c.avgViewCount)}</td>
                   <td className="table__num" data-label="캠페인">{c.totalCampaignCount}건</td>
                   <td className="table__num" data-label="평점">
-                    {c.hasHistory ? formatRating(c.rating) : (
-                      <span className="estimate">예상 {formatRating(c.rating)}<Tooltip text={estimatedRatingTooltip(stats)} label="예상 평점 설명" /></span>
-                    )}
+                    {formatRating(c.rating)}
                   </td>
                   <td className="table__num" data-label="단가">
-                    {c.hasHistory ? formatCompact(c.rate) : (
-                      <span className="estimate">예상 {formatCompact(c.rate)}<Tooltip text={estimatedRateTooltip(c, stats)} label="예상 단가 설명" /></span>
-                    )}
+                    {formatCompact(c.rate)}
                   </td>
                   <td className="table__action">
                     <button
@@ -139,7 +125,7 @@ export function ResultsTable({
                   <tr className="explain-row">
                     <td colSpan={COLUMN_COUNT}>
                       {admin && weights
-                        ? <ScoreBreakdown creator={c} weights={weights} stats={stats} />
+                        ? <ScoreBreakdown creator={c} weights={weights} />
                         : <ExplainRow creator={c} />}
                     </td>
                   </tr>

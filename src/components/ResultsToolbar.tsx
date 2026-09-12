@@ -23,7 +23,7 @@ const PLATFORM_OPTIONS: { value: 'all' | Platform; label: string }[] = [
 export function ResultsToolbar({ count, filters, onChange, sort, onSortChange }: Props) {
   return (
     <div className="toolbar">
-      <h2 className="results__title">섭외 가능한 크리에이터 {count}명</h2>
+      <h2 className="results__title">캠페인 이력이 있는 후보 {count}명</h2>
       <div className="toolbar__controls">
         <div className="toolbar__sort">
           <label htmlFor="sort-key">정렬</label>

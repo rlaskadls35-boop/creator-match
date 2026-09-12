@@ -43,6 +43,7 @@ export function WeightsCard({ draft, saved, onChange, onSave, onCancel, onDefaul
         <span className="weights__state">{same ? '저장된 기준' : '저장하지 않은 변경'}</span>
       </div>
 
+      <p className="weights__scope">이력이 있는 후보의 네 지표를 비교합니다. 캠페인 건수는 참고 정보이며, 신규 후보에는 매칭 점수를 부여하지 않습니다.</p>
       <div className="weights__grid">
         {METRIC_KEYS.map((k) => {
           const value = draft[k];

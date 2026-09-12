@@ -8,7 +8,7 @@ export function ZeroResults({ info, stats, onRelax }: { info: ZeroResultInfo; st
   return (
     <div className="zero">
       <section className="card zero__diagnosis">
-        <h2 className="zero__title">조건에 맞는 크리에이터가 없습니다</h2>
+        <h2 className="zero__title">조건에 맞는 이력 있는 후보가 없습니다</h2>
         <p className="zero__text">{info.diagnosis}{info.extraNote ? ` ${info.extraNote}` : ''}</p>
       </section>
       <RelaxationList title="조건을 바꿔 보시겠어요?" items={info.relaxations} onRelax={onRelax} />

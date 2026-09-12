@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import type { DatasetStats, ScoredCreator, Weights } from '../domain/types';
 import { matchScore, rankCreators } from '../domain/scoring';
-import { filterCandidates, sortCandidates, applyResultFilters, DEFAULT_SORT, DEFAULT_FILTERS, SORT_DEFAULT_DIRECTION } from '../domain/recommend';
-import type { SearchInput, SortKey, SortState, ResultFilters } from '../domain/recommend';
+import { filterCandidates, sortCandidates, applyResultFilters, DEFAULT_SORT, DEFAULT_FILTERS, SORT_DEFAULT_DIRECTION, filterNewCandidates, sortNewCandidates } from '../domain/recommend';
+import type { SearchInput, SortKey, SortState, ResultFilters, NewCandidateSortKey } from '../domain/recommend';
 import { diagnoseZeroResult, buildRelaxations, FEW_RESULTS_THRESHOLD } from '../domain/recommend';
 import { EMPTY_FORM, toSearchInput } from '../domain/searchForm';
 import type { SearchFormState } from '../domain/searchForm';
@@ -10,6 +10,7 @@ import { fromSearchInput } from '../domain/searchForm';
 import { SearchPanel } from './SearchPanel';
 import { ResultsToolbar } from './ResultsToolbar';
 import { ResultsTable } from './ResultsTable';
+import { NewCandidatesTable } from './NewCandidatesTable';
 import { ZeroResults } from './ZeroResults';
 import { RelaxationList } from './RelaxationList';
 import { ConditionSummary } from './ConditionSummary';
@@ -33,10 +34,13 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
   const [query, setQuery] = useState<SearchInput | null>(null);
   const [sort, setSort] = useState<SortState>(DEFAULT_SORT);
   const [filters, setFilters] = useState<ResultFilters>(DEFAULT_FILTERS);
+  const [newSort, setNewSort] = useState<NewCandidateSortKey>('engagement');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const candidates = useMemo(() => (query ? filterCandidates(ranked, query) : []), [ranked, query]);
   const visible = useMemo(() => sortCandidates(applyResultFilters(candidates, filters), sort), [candidates, filters, sort]);
+  const newCandidates = useMemo(() => query ? filterNewCandidates(creators, query) : [], [creators, query]);
+  const visibleNew = useMemo(() => sortNewCandidates(applyResultFilters(newCandidates, filters), newSort), [newCandidates, filters, newSort]);
   // 0명 판정은 결과 필터(플랫폼·이력) 적용 전 인원으로 (설계 §5.1)
   const zeroInfo = useMemo(() => (query && candidates.length === 0 ? diagnoseZeroResult(ranked, query) : null), [ranked, query, candidates]);
   const fewRelaxations = useMemo(
@@ -47,8 +51,8 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
   // 저장된 비중으로 계산한 점수·순위 (운영자 화면 비교용, L23)
   const savedScoreById = useMemo(() => {
     if (!admin || !savedWeights) return null;
-    return new Map(creators.map((c) => [c.id, matchScore(c, savedWeights)]));
-  }, [admin, savedWeights, creators]);
+    return new Map(ranked.map((c) => [c.id, matchScore(c, savedWeights)]));
+  }, [admin, savedWeights, ranked]);
   // 순위 비교는 매칭 점수 내림차순으로 볼 때만 뜻이 있다
   const priorRankById = useMemo(() => {
     if (!savedScoreById || sort.key !== 'match' || sort.direction !== 'desc') return null;
@@ -66,6 +70,7 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
     setSort(DEFAULT_SORT);
     setFilters(DEFAULT_FILTERS);
     setExpandedId(null);
+    setNewSort('engagement');
   };
   const handleSubmit = () => {
     const input = toSearchInput(form);
@@ -86,12 +91,13 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
       <section className="results">
         {query === null ? (
           <p className="results__empty">조건을 입력하고 크리에이터 찾기를 누르세요</p>
-        ) : zeroInfo ? (
-          <ZeroResults info={zeroInfo} stats={stats} onRelax={handleRelax} />
         ) : (
           <>
             <ResultsToolbar count={visible.length} filters={filters} onChange={setFilters} sort={sort} onSortChange={handleSort} />
-            {visible.length === 0 ? (
+            <p className="results__context">과거 평균 단가가 입력 예산 이내인 후보입니다. 캠페인 건수는 참고 정보로 표시합니다.</p>
+            {zeroInfo ? (
+              <ZeroResults info={zeroInfo} stats={stats} onRelax={handleRelax} />
+            ) : visible.length === 0 ? (
               <p className="results__empty">선택한 필터에 맞는 크리에이터가 없습니다. 필터를 풀어 보세요.</p>
             ) : (
               <ResultsTable
@@ -107,8 +113,9 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
                 priorRankById={priorRankById}
               />
             )}
+            {!filters.historyOnly && <NewCandidatesTable rows={visibleNew} stats={stats} sortKey={newSort} onSortChange={setNewSort} />}
             {fewRelaxations && (
-              <RelaxationList compact title="후보가 적습니다. 조건을 넓히면 더 볼 수 있습니다." items={fewRelaxations} onRelax={handleRelax} />
+              <RelaxationList compact title="이력이 있는 후보가 적습니다. 조건을 넓히면 더 볼 수 있습니다." items={fewRelaxations} onRelax={handleRelax} />
             )}
           </>
         )}

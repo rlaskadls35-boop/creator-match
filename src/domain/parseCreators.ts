@@ -108,24 +108,22 @@ export function parseCreators(csvText: string): Dataset {
     : 0;
   const medianRateByTier = {} as Record<Tier, number>;
   for (const t of TIERS) {
-    const rates = withHistory.filter((b) => tierOf(b.followers) === t).map((b) => b.avgCampaignBudgetKrw);
+    const rates = withHistory.filter((b) => tierOf(b.followers) === t).map((b) => b.avgCampaignBudgetKrw).filter((rate) => rate > 0);
     medianRateByTier[t] = rates.length ? median(rates) : 0;
   }
 
   const creators: Creator[] = base.map((b) => {
     const tier = tierOf(b.followers);
     const hasHistory = b.totalCampaignCount > 0;
-    const rate = hasHistory ? b.avgCampaignBudgetKrw : medianRateByTier[tier];
-    const rating = b.advertiserRating ?? ratingAverage;
+    const rate = hasHistory && b.avgCampaignBudgetKrw > 0 ? b.avgCampaignBudgetKrw : null;
+    const rating = hasHistory ? b.advertiserRating : null;
     return {
       ...b,
       tier,
       hasHistory,
       rate,
-      rateIsEstimated: !hasHistory,
       rating,
-      ratingIsEstimated: b.advertiserRating === null,
-      costPerView: b.avgViewCount > 0 ? rate / b.avgViewCount : Number.POSITIVE_INFINITY,
+      costPerView: rate !== null && b.avgViewCount > 0 ? rate / b.avgViewCount : null,
     };
   });
 

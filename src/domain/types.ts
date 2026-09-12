@@ -7,8 +7,8 @@ export type Platform = (typeof PLATFORMS)[number];
 export const TIERS = ['나노', '마이크로', '매크로'] as const;
 export type Tier = (typeof TIERS)[number];
 
-/** 점수 항목 5개. 순서는 화면 표시 순서(설계 §5.3 표) */
-export const METRIC_KEYS = ['engagement', 'views', 'rating', 'costPerView', 'campaigns'] as const;
+/** 점수 항목 4개. 캠페인 건수는 참고 정보로만 표시 */
+export const METRIC_KEYS = ['engagement', 'views', 'rating', 'costPerView'] as const;
 export type MetricKey = (typeof METRIC_KEYS)[number];
 
 export interface Creator {
@@ -26,11 +26,9 @@ export interface Creator {
   // 파생 필드 (설계 §3.4)
   tier: Tier;
   hasHistory: boolean;
-  rate: number;
-  rateIsEstimated: boolean;
-  rating: number;
-  ratingIsEstimated: boolean;
-  costPerView: number;
+  rate: number | null;
+  rating: number | null;
+  costPerView: number | null;
 }
 
 export interface MetricScore {
@@ -49,10 +47,14 @@ export interface MetricScore {
 }
 
 export interface ScoredCreator extends Creator {
-  metrics: Record<MetricKey, MetricScore>;
+  metrics: Partial<Record<MetricKey, MetricScore>>;
 }
 
 export interface RankedCreator extends ScoredCreator {
+  rate: number;
+  rating: number;
+  costPerView: number;
+  metrics: Record<MetricKey, MetricScore>;
   /** 매칭 점수 0~100 (반올림 전) */
   matchScore: number;
 }
