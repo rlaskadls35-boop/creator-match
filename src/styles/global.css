@@ -96,3 +96,52 @@ button { font: inherit; }
 .results { margin-top: 8px; }
 .results__empty { text-align: center; color: var(--text-muted); padding: 40px 0; margin: 0; }
 .results__title { font-size: 18px; margin: 0; }
+
+/* ── 결과 조작 줄 ── */
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 4px 0 12px; flex-wrap: wrap; }
+.toolbar__controls { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.segment { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; background: #fff; padding: 3px; }
+.segment__item { border: 0; background: transparent; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-size: 14px; color: var(--text-muted); transition: background .15s ease, color .15s ease; }
+.segment__item.is-on { background: var(--primary); color: #fff; font-weight: 700; }
+.check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.check input { width: 16px; height: 16px; accent-color: var(--primary); }
+
+/* ── 결과 표 ── */
+.table-wrap { overflow-x: auto; background: var(--card); border-radius: var(--radius-card); box-shadow: var(--shadow); }
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th { text-align: left; font-size: 13px; color: var(--text-muted); font-weight: 500; padding: 14px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.table td { padding: 14px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr:hover td { background: #FAFBFF; }
+.table .table__num { text-align: right; }
+.table th.is-sorted { color: var(--primary-deep); font-weight: 700; }
+.row--top td { background: var(--primary-soft) !important; }
+.sort-btn { border: 0; background: transparent; padding: 0; cursor: pointer; color: inherit; font: inherit; display: inline-flex; align-items: center; gap: 4px; }
+.sort-btn:hover { color: var(--primary); }
+.sort-btn__arrow { font-size: 11px; opacity: .7; }
+.rank { display: inline-flex; width: 28px; height: 28px; border-radius: 50%; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; background: var(--primary-soft); color: var(--primary-deep); }
+.rank--top { background: var(--primary); color: #fff; }
+.creator__name { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.creator__meta { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+.badge { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+.badge--warning { background: var(--warning-bg); color: var(--warning-fg); }
+.estimate { color: var(--text-muted); white-space: nowrap; }
+.score { display: inline-flex; align-items: center; gap: 8px; }
+.bar { display: inline-block; width: 90px; height: 8px; border-radius: 999px; background: var(--primary-soft); overflow: hidden; vertical-align: middle; }
+.bar__fill { display: block; height: 100%; background: var(--primary); border-radius: 999px; transition: width .3s ease; }
+.expand-btn { border: 1px solid var(--border); background: #fff; width: 32px; height: 32px; border-radius: 10px; cursor: pointer; color: var(--primary-deep); font-size: 14px; }
+.expand-btn:hover, .expand-btn[aria-expanded="true"] { border-color: var(--primary); background: var(--primary-soft); }
+.table__action { text-align: center; }
+.explain-row td { background: #F8FAFF; padding: 18px 20px 22px; }
+
+/* ── 추천 이유 ── */
+.explain__title { margin: 0 0 12px; font-size: 15px; font-weight: 700; }
+.chip--positive { background: var(--positive-bg); color: var(--positive-fg); border-color: transparent; font-weight: 500; }
+.cautions { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.caution { display: inline-flex; align-self: flex-start; padding: 6px 12px; border-radius: 10px; background: var(--warning-bg); color: var(--warning-fg); font-size: 13.5px; }
+.bars { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 8px; }
+.bars__item { display: grid; grid-template-columns: 150px 1fr 40px auto; gap: 12px; align-items: center; font-size: 13.5px; }
+.bars__item .bar { width: 100%; max-width: 320px; }
+.bars__label { color: var(--text); }
+.bars__score { text-align: right; font-weight: 700; }
+.bars__rank { color: var(--text-muted); font-size: 12.5px; }

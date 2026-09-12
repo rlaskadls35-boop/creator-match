@@ -1,0 +1,38 @@
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import App from './App';
+
+describe('광고주 화면 스모크 (설계 §8)', () => {
+  it('조건을 입력해 검색하면 결과 표가 보이고 추천 이유를 펼칠 수 있다', async () => {
+    window.location.hash = '#/';
+    localStorage.clear();
+    render(<App />);
+    const user = userEvent.setup();
+
+    expect(screen.getByText('조건을 입력하고 크리에이터 찾기를 누르세요')).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('크리에이터 1명당 섭외 예산'), '1500000');
+    expect(screen.getByText('→ 150만 원')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '뷰티' }));
+    await user.click(screen.getByRole('button', { name: '패션' }));
+    await user.click(screen.getByRole('radio', { name: /마이크로/ }));
+    await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
+
+    expect(screen.getByText('섭외 가능한 크리에이터 18명')).toBeInTheDocument();
+    const rows = screen.getAllByRole('row');
+    expect(rows[1]).toHaveTextContent('정은매거진77');
+    expect(rows[1]).toHaveTextContent('73'); // 매칭 점수 72.6 → 73
+
+    await user.click(screen.getByRole('button', { name: '정은매거진77 추천 이유 보기' }));
+    expect(screen.getByText('왜 추천하나요?')).toBeInTheDocument();
+    expect(screen.getByText('유의점: 참여율은 마이크로 중 하위권입니다 (6.5%)')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /^평점/ }));
+    const afterSort = screen.getAllByRole('row');
+    expect(afterSort[afterSort.length - 1]).toHaveTextContent('캠페인 이력 없음');
+
+    await user.click(screen.getByRole('checkbox', { name: '캠페인 이력 있는 크리에이터만' }));
+    expect(screen.getByText('섭외 가능한 크리에이터 15명')).toBeInTheDocument();
+  });
+});
