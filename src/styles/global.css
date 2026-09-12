@@ -18,3 +18,46 @@
   --font: 'Noto Sans KR', system-ui, -apple-system, 'Apple SD Gothic Neo', sans-serif;
 }
 body { margin: 0; font-family: var(--font); background: var(--background); color: var(--text); font-size: 15px; line-height: 1.5; }
+
+/* ── 기본 ── */
+* { box-sizing: border-box; }
+a { color: var(--primary); }
+button { font: inherit; }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ── 레이아웃 ── */
+.page { min-height: 100vh; display: flex; flex-direction: column; }
+.main { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px 48px; flex: 1; }
+.main--narrow { max-width: 480px; padding-top: 24px; }
+.intro { font-size: 22px; font-weight: 700; margin: 8px 0 20px; }
+.card { background: var(--card); border-radius: var(--radius-card); box-shadow: var(--shadow); padding: 24px; }
+.card--placeholder { color: var(--text-muted); }
+.error { color: var(--destructive); }
+
+/* ── 헤더·푸터 ── */
+.header { width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.header__brand { display: flex; align-items: center; gap: 12px; }
+.header__logo { display: inline-flex; border-radius: 11px; }
+.header__title { font-weight: 700; font-size: 20px; color: var(--primary-deep); line-height: 1.2; }
+.header__subtitle { font-size: 13px; color: var(--text-muted); }
+.header__link { font-size: 14px; color: var(--text-muted); text-decoration: none; }
+.header__link:hover { color: var(--primary); text-decoration: underline; }
+.header__account { display: flex; align-items: center; gap: 12px; }
+.header__account-name { font-size: 14px; color: var(--text-muted); }
+.footer { width: 100%; max-width: 1200px; margin: 0 auto; padding: 16px 24px 32px; font-size: 13px; color: var(--text-muted); }
+
+/* ── 버튼 ── */
+.btn { border: 1px solid var(--border); background: var(--card); color: var(--text); padding: 10px 16px; border-radius: 12px; cursor: pointer; transition: background .15s ease, border-color .15s ease, color .15s ease; }
+.btn:hover { border-color: var(--primary); color: var(--primary); }
+.btn--primary { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 700; }
+.btn--primary:hover { background: var(--primary-deep); border-color: var(--primary-deep); color: #fff; }
+.btn--ghost { background: transparent; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn:disabled:hover { border-color: var(--border); color: inherit; }
+.btn--primary:disabled:hover { background: var(--primary); color: #fff; }
+
+/* ── 툴팁 ── */
+.tip { position: relative; display: inline-flex; margin-left: 4px; vertical-align: middle; }
+.tip__trigger { border: 0; background: transparent; color: var(--primary); cursor: help; padding: 0 2px; font-size: 14px; line-height: 1; }
+.tip__bubble { display: none; position: absolute; z-index: 20; right: 0; bottom: calc(100% + 8px); width: 280px; max-width: 70vw; padding: 10px 12px; background: var(--text); color: #fff; font-size: 12.5px; line-height: 1.5; font-weight: 400; border-radius: 10px; text-align: left; white-space: normal; }
+.tip:hover .tip__bubble, .tip:focus-within .tip__bubble { display: block; }
