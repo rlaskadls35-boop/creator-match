@@ -115,7 +115,6 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
                 onToggleExpand={toggleExpand}
                 variant={variant}
                 weights={weights}
-                savedScoreById={savedScoreById}
                 priorRankById={priorRankById}
               />
             )}

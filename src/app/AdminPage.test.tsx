@@ -89,7 +89,7 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     await user.click(screen.getByRole('button', { name: '비중 저장' }));
     expect(screen.getByText('저장했습니다. 광고주 화면에 적용됩니다.')).toBeInTheDocument();
     expect(screen.getByText('저장된 기준')).toBeInTheDocument();
-    expect(screen.getAllByText('저장값과 동일')).toHaveLength(2);
+    expect(screen.queryByText('저장값과 동일')).not.toBeInTheDocument();
   });
 
   it('변경 취소를 누르면 입력과 미리보기가 저장된 값으로 돌아간다', async () => {

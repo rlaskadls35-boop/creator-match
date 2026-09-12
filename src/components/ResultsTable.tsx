@@ -17,8 +17,6 @@ interface Props {
   variant?: 'advertiser' | 'admin';
   /** 운영자 화면에서 계산 내역에 쓰는 현재 미리보기 비중 */
   weights?: Weights;
-  /** 저장된 비중으로 계산한 매칭 점수 (운영자 화면 비교용) */
-  savedScoreById?: Map<string, number> | null;
   /** 저장된 비중 기준 순위 (매칭 점수 정렬일 때만) */
   priorRankById?: Map<string, number> | null;
 }
@@ -45,15 +43,9 @@ export function scoreBand(score: number): 1 | 2 | 3 | 4 | 5 {
   return 1;
 }
 
-/** 저장값 대비 점수 변화 문구. 0.05점 미만이면 "동일"로 본다 (L23) */
-export function scoreDeltaText(delta: number): string {
-  if (Math.abs(delta) < 0.05) return '저장값과 동일';
-  return `${delta > 0 ? '+' : '−'}${Math.abs(delta).toFixed(1)}점`;
-}
-
 export function ResultsTable({
   rows, sort, onSortChange, expandedId, onToggleExpand,
-  variant = 'advertiser', weights, savedScoreById, priorRankById,
+  variant = 'advertiser', weights, priorRankById,
 }: Props) {
   const admin = variant === 'admin';
   const rankHeader = sort.key === 'match' ? '순위' : `순위 (${SORT_LABEL[sort.key]} 기준)`;
@@ -88,8 +80,6 @@ export function ResultsTable({
           {rows.map((c, i) => {
             const open = expandedId === c.id;
             const score = Math.round(c.matchScore);
-            const savedScore = savedScoreById?.get(c.id);
-            const delta = savedScore === undefined ? null : c.matchScore - savedScore;
             const prior = priorRankById?.get(c.id);
             return (
               <Fragment key={c.id}>
@@ -108,9 +98,6 @@ export function ResultsTable({
                   <td className="table__text" data-label="카테고리">{c.category}</td>
                   <td className="table__num" data-label="매칭 점수">
                     <span className="score-badge" data-band={scoreBand(score)}>{score}</span>
-                    {delta !== null && (
-                      <span className="delta" data-up={delta >= 0.05}>{scoreDeltaText(delta)}</span>
-                    )}
                   </td>
                   <td className="table__num" data-label="팔로워 수">{formatInt(c.followers)}명</td>
                   <td className="table__num" data-label="평균 조회수">{formatInt(c.avgViewCount)}회</td>
