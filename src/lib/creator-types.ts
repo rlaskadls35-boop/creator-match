@@ -21,3 +21,23 @@ export type CampaignFilters = {
   platform: PlatformFilter;
   size: FollowerSize;
 };
+
+export type CreatorResultsData = {
+  matches: Creator[];
+  unknownBudgetCount: number;
+};
+
+/** CSV의 11개 컬럼을 보존하는 저장용 데이터. 공란만 NULL로 변환한다. */
+export type CreatorRecord = {
+  creator_id: string;
+  creator_name: string;
+  category: string;
+  platform: CreatorPlatform;
+  followers: number | null;
+  avg_view_count: number | null;
+  engagement_rate: number | null;
+  total_campaign_count: number | null;
+  total_campaign_budget_krw: number | null;
+  avg_campaign_budget_krw: number | null;
+  advertiser_rating: number | null;
+};

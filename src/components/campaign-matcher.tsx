@@ -1,22 +1,14 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ArrowRight, Check, RotateCcw, SlidersHorizontal,
 } from "lucide-react";
 import CreatorResults from "./creator-results";
-import { filterCreators } from "@/lib/creator-filter";
-import type { Creator, FollowerSize, PlatformFilter } from "@/lib/creator-types";
+import { categories, maxBudget, platforms, sizes } from "@/lib/campaign-options";
+import type { CreatorResultsData, FollowerSize, PlatformFilter } from "@/lib/creator-types";
 
-const categories = ["뷰티", "식품", "패션", "피트니스", "여행", "아웃도어", "라이프스타일", "테크", "게임", "교육"];
-const platforms = ["전체", "유튜브", "인스타그램"] as const;
-const sizes = [
-  { id: "nano", name: "나노", range: "1만 미만" },
-  { id: "micro", name: "마이크로", range: "1만 이상 ~ 10만 미만" },
-  { id: "macro", name: "매크로", range: "10만 이상" },
-] as const;
 type FormErrors = { budget?: string; category?: string; size?: string };
-const maxBudget = 999_999_999_999;
 
 function koreanAmount(amount: number) {
   if (!amount) return "";
@@ -28,23 +20,33 @@ function koreanAmount(amount: number) {
   return `${units.filter(({ value }) => value).map(({ value, unit }) => `${value.toLocaleString("ko-KR")}${unit}`).join(" ")} 원`;
 }
 
-export default function CampaignMatcher({ creators }: { creators: Creator[] }) {
+export default function CampaignMatcher() {
   const [budget, setBudget] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [platform, setPlatform] = useState<PlatformFilter>("전체");
   const [size, setSize] = useState<FollowerSize | "">("");
   const [errors, setErrors] = useState<FormErrors>({});
-  const [confirmed, setConfirmed] = useState(false);
+  const [results, setResults] = useState<CreatorResultsData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchError, setSearchError] = useState("");
+  const activeRequest = useRef<AbortController | null>(null);
   const numericBudget = Number(budget);
-  const results = confirmed && size
-    ? filterCreators(creators, { budget: numericBudget, categories: selectedCategories, platform, size })
-    : null;
+
+  useEffect(() => () => { activeRequest.current?.abort(); }, []);
+
+  function clearResults() {
+    activeRequest.current?.abort();
+    activeRequest.current = null;
+    setResults(null);
+    setIsLoading(false);
+    setSearchError("");
+  }
 
   function updateBudget(value: string) {
     const normalized = value.replace(/,/g, "").trim();
     if (!/^\d*$/.test(normalized) || Number(normalized) > maxBudget) return;
     setBudget(normalized ? String(Number(normalized)) : "");
-    setConfirmed(false);
+    clearResults();
     setErrors((previous) => ({ ...previous, budget: undefined }));
   }
 
@@ -52,7 +54,7 @@ export default function CampaignMatcher({ creators }: { creators: Creator[] }) {
     setSelectedCategories((previous) => previous.includes(category)
       ? previous.filter((item) => item !== category)
       : categories.filter((item) => item === category || previous.includes(item)));
-    setConfirmed(false);
+    clearResults();
     setErrors((previous) => ({ ...previous, category: undefined }));
   }
 
@@ -62,20 +64,45 @@ export default function CampaignMatcher({ creators }: { creators: Creator[] }) {
     setPlatform("전체");
     setSize("");
     setErrors({});
-    setConfirmed(false);
+    clearResults();
   }
 
-  function confirmConditions(event: FormEvent<HTMLFormElement>) {
+  async function confirmConditions(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    clearResults();
     const nextErrors: FormErrors = {};
     if (numericBudget <= 0) nextErrors.budget = "1원 이상의 예산을 입력해 주세요.";
     if (!selectedCategories.length) nextErrors.category = "카테고리를 1개 이상 선택해 주세요.";
     if (!size) nextErrors.size = "팔로워 규모를 선택해 주세요.";
     setErrors(nextErrors);
-    setConfirmed(Object.keys(nextErrors).length === 0);
     if (nextErrors.budget) document.getElementById("budget")?.focus();
     else if (nextErrors.category) document.getElementById("category-0")?.focus();
     else if (nextErrors.size) document.getElementById("size-nano")?.focus();
+    if (Object.keys(nextErrors).length || !size) return;
+
+    const controller = new AbortController();
+    activeRequest.current = controller;
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/creators", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ budget: numericBudget, categories: selectedCategories, platform, size }),
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error("Creator search failed");
+      const data: CreatorResultsData = await response.json();
+      if (activeRequest.current === controller) setResults(data);
+    } catch {
+      if (activeRequest.current === controller) {
+        setSearchError("크리에이터 정보를 불러오지 못했어요. 조건 확인하기를 다시 눌러 주세요.");
+      }
+    } finally {
+      if (activeRequest.current === controller) {
+        activeRequest.current = null;
+        setIsLoading(false);
+      }
+    }
   }
 
   return (
@@ -162,7 +189,7 @@ export default function CampaignMatcher({ creators }: { creators: Creator[] }) {
                         <label key={option} className={`choice-button ${platform === option ? "is-selected" : ""}`}>
                           <input
                             type="radio" name="platform" value={option} checked={platform === option}
-                            onChange={() => { setPlatform(option); setConfirmed(false); }}
+                            onChange={() => { setPlatform(option); clearResults(); }}
                           />
                           <span className="choice-check" aria-hidden="true">{platform === option && <Check size={16} strokeWidth={2.5} />}</span>
                           {option}
@@ -181,7 +208,7 @@ export default function CampaignMatcher({ creators }: { creators: Creator[] }) {
                           <label className={`choice-button ${size === option.id ? "is-selected" : ""} ${errors.size ? "has-error" : ""}`}>
                             <input type="radio" id={`size-${option.id}`} name="follower-size" value={option.id} checked={size === option.id} required
                               aria-describedby={`range-${option.id}`}
-                              onChange={() => { setSize(option.id); setConfirmed(false); setErrors((previous) => ({ ...previous, size: undefined })); }} />
+                              onChange={() => { setSize(option.id); clearResults(); setErrors((previous) => ({ ...previous, size: undefined })); }} />
                             <span className="choice-check" aria-hidden="true">{size === option.id && <Check size={16} strokeWidth={2.5} />}</span>
                             {option.name}
                           </label>
@@ -196,11 +223,12 @@ export default function CampaignMatcher({ creators }: { creators: Creator[] }) {
 
               <div className="form-actions">
                 <span className="required-caption"><span aria-hidden="true">*</span> 필수 입력</span>
-                <button className="primary-button" type="submit">조건 확인하기<ArrowRight size={18} aria-hidden="true" /></button>
+                <button className="primary-button" type="submit" disabled={isLoading} aria-busy={isLoading}>{isLoading ? "조회 중…" : "조건 확인하기"}<ArrowRight size={18} aria-hidden="true" /></button>
               </div>
             </form>
           </section>
-          <p className="visually-hidden" role="status">{results ? `조건에 맞는 크리에이터 ${results.matches.length}명` : ""}</p>
+          <p className="visually-hidden" role="status">{isLoading ? "조건에 맞는 크리에이터를 조회하고 있습니다." : results ? `조건에 맞는 크리에이터 ${results.matches.length}명` : ""}</p>
+          {searchError && <p className="search-error" role="alert">{searchError}</p>}
           {results && <CreatorResults creators={results.matches} unknownBudgetCount={results.unknownBudgetCount} />}
         </div>
 
