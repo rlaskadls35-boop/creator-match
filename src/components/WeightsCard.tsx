@@ -65,7 +65,6 @@ export function WeightsCard({ draft, saved, onChange, onSave, onCancel, onDefaul
       {open && (
         <div id="weights-details" className="weights__details">
           <p className="weights__desc">합계 100%를 맞추면 아래 미리보기가 갱신됩니다. 저장하면 광고주 화면에 적용됩니다.</p>
-          <p className="weights__scope">이력이 있는 후보의 네 지표를 비교합니다. 캠페인 건수는 참고 정보이며, 신규 후보에는 매칭 점수를 부여하지 않습니다.</p>
           <div className="weights__grid">
             {METRIC_KEYS.map((k) => {
               const value = draft[k];
@@ -93,16 +92,6 @@ export function WeightsCard({ draft, saved, onChange, onSave, onCancel, onDefaul
                     </span>
                     <button type="button" className="weight__step" disabled={value === 100} aria-label={`${METRIC_LABEL[k]} 비중 1 늘리기`} onClick={() => step(k, 1)}>+</button>
                   </div>
-                  <input
-                    className="weight__range"
-                    type="range"
-                    min={0}
-                    max={100}
-                    step={1}
-                    value={value === null ? 0 : clamp(value)}
-                    aria-label={`${METRIC_LABEL[k]} 비중 슬라이더`}
-                    onChange={(e) => set(k, Number(e.target.value))}
-                  />
                   <span className="weight__hint">{METRIC_HINT[k]}</span>
                 </div>
               );
