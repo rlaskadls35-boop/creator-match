@@ -7,13 +7,17 @@ import { SESSION_KEY } from './session';
 
 const data = loadDataset();
 
-/** 제안서와 같은 조건: 1명당 50만 원 · 뷰티 · 나노 → 3명 */
+/** 제안서와 같은 조건: 1명당 50만 원 · 뷰티 · 나노 → 이력 후보 2명 */
 async function searchThree(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText('크리에이터 1명당 섭외 예산'), '500000');
   await user.click(screen.getByRole('button', { name: '뷰티' }));
   await user.click(screen.getByRole('radio', { name: /나노/ }));
   await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
   expect(await screen.findByText('캠페인 이력이 있는 후보 2명')).toBeInTheDocument();
+}
+
+async function openWeights(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: '비중 조절' }));
 }
 
 describe('운영자 비중 화면 (개선안 L23)', () => {
@@ -34,11 +38,25 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     expect(weightsTitle.compareDocumentPosition(resultsGuide) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
+  it('비중 상세 설정은 기본으로 접혀 있고 필요할 때 펼치고 다시 접을 수 있다', async () => {
+    if (!data.ok) throw new Error('데이터 로드 실패');
+    render(<AdminPage data={data} />);
+    const user = userEvent.setup();
+
+    expect(screen.queryByLabelText('참여율 비중 (%)')).not.toBeInTheDocument();
+    await openWeights(user);
+    expect(screen.getByLabelText('참여율 비중 (%)')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '접기' })).toHaveAttribute('aria-expanded', 'true');
+    await user.click(screen.getByRole('button', { name: '접기' }));
+    expect(screen.queryByLabelText('참여율 비중 (%)')).not.toBeInTheDocument();
+  });
+
   it('합계가 100이 아닌 동안에는 미리보기가 멈추고, 100을 맞추면 갱신된다', async () => {
     if (!data.ok) throw new Error('데이터 로드 실패');
     render(<AdminPage data={data} />);
     const user = userEvent.setup();
     await searchThree(user);
+    await openWeights(user);
 
     expect(screen.getByText('미리보기 조건')).toBeInTheDocument();
     expect(screen.getByText('저장된 기준')).toBeInTheDocument();
@@ -79,6 +97,7 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     render(<AdminPage data={data} />);
     const user = userEvent.setup();
     await searchThree(user);
+    await openWeights(user);
     const before = screen.getAllByRole('row')[1].textContent;
 
     const engagement = screen.getByLabelText('참여율 비중 (%)');
@@ -100,6 +119,7 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     render(<AdminPage data={data} />);
     const user = userEvent.setup();
     await searchThree(user);
+    await openWeights(user);
     expect(screen.getAllByRole('spinbutton')).toHaveLength(4);
     expect(screen.queryByLabelText('캠페인 건수 비중 (%)')).not.toBeInTheDocument();
     const fresh = screen.getByRole('table', { name: '추가 확인이 필요한 신규 후보' });

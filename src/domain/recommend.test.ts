@@ -8,7 +8,7 @@ import type { SearchInput } from './recommend';
 
 const all = scoreCreators(parseCreators(csvText).creators);
 const ranked = rankCreators(all, DEFAULT_WEIGHTS);
-const Q: SearchInput = { budget: 1_500_000, categories: ['뷰티', '패션'], tier: '마이크로' };
+const Q: SearchInput = { platform: 'all', budget: 1_500_000, categories: ['뷰티', '패션'], tier: '마이크로' };
 
 describe('filterCandidates (설계 §5.1)', () => {
   it('뷰티+패션 / 마이크로 / 150만 → 이력 있는 후보 15명, 1위 정은매거진77', () => {
@@ -17,10 +17,14 @@ describe('filterCandidates (설계 §5.1)', () => {
     expect(c[0].id).toBe('C0077');
   });
   it('예산 경계: 단가 == 예산은 포함 (민석스토리37, 테크·마이크로 1,500,000)', () => {
-    const at = filterCandidates(ranked, { budget: 1_500_000, categories: ['테크'], tier: '마이크로' });
-    const below = filterCandidates(ranked, { budget: 1_499_999, categories: ['테크'], tier: '마이크로' });
+    const at = filterCandidates(ranked, { ...Q, budget: 1_500_000, categories: ['테크'] });
+    const below = filterCandidates(ranked, { ...Q, budget: 1_499_999, categories: ['테크'] });
     expect(at.some((c) => c.id === 'C0037')).toBe(true);
     expect(below.some((c) => c.id === 'C0037')).toBe(false);
+  });
+  it('플랫폼은 검색 전에 기존·신규 후보 모두에 적용한다', () => {
+    expect(filterCandidates(ranked, { ...Q, platform: '유튜브' })).toHaveLength(6);
+    expect(filterNewCandidates(all, { ...Q, platform: '유튜브' })).toHaveLength(1);
   });
   it('신규는 예산에 관계없이 별도 후보이며 종합 후보에는 포함하지 않는다', () => {
     expect(filterCandidates(ranked, Q).some((c) => c.id === 'C0036')).toBe(false);
@@ -60,9 +64,8 @@ describe('sortCandidates (설계 §5.10)', () => {
 
 describe('applyResultFilters (설계 §5.10 필터)', () => {
   const cands = filterCandidates(ranked, Q);
-  it('유튜브만 → 6명, 이력 있는 사람만 → 15명, 둘 다 → 6명', () => {
-    expect(applyResultFilters(cands, { platform: '유튜브', historyOnly: false })).toHaveLength(6);
-    expect(applyResultFilters(cands, { platform: 'all', historyOnly: true })).toHaveLength(15);
-    expect(applyResultFilters(cands, { platform: '유튜브', historyOnly: true })).toHaveLength(6);
+  it('검색 후에는 이력 필터만 적용한다', () => {
+    expect(applyResultFilters(cands, { historyOnly: false })).toHaveLength(15);
+    expect(applyResultFilters(cands, { historyOnly: true })).toHaveLength(15);
   });
 });

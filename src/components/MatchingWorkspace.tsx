@@ -44,7 +44,7 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
   const visible = useMemo(() => sortCandidates(applyResultFilters(candidates, filters), sort), [candidates, filters, sort]);
   const newCandidates = useMemo(() => query ? filterNewCandidates(creators, query) : [], [creators, query]);
   const visibleNew = useMemo(() => sortNewCandidates(applyResultFilters(newCandidates, filters), newSort), [newCandidates, filters, newSort]);
-  // 0명 판정은 결과 필터(플랫폼·이력) 적용 전 인원으로 (설계 §5.1)
+  // 0명 판정은 검색 조건(플랫폼 포함)이 적용된 이력 후보 기준으로 한다
   const zeroInfo = useMemo(() => (query && candidates.length === 0 ? diagnoseZeroResult(ranked, query) : null), [ranked, query, candidates]);
   const fewRelaxations = useMemo(
     () => (query && candidates.length > 0 && candidates.length < FEW_RESULTS_THRESHOLD ? buildRelaxations(ranked, query) : null),

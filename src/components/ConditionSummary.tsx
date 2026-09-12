@@ -12,6 +12,7 @@ export function ConditionSummary({ input, note }: Props) {
     <div className="conditions">
       <span className="conditions__items" aria-label="추천 결과 미리보기 조건">
         <strong>미리보기 조건</strong>
+        <span>플랫폼 <strong>{input.platform === 'all' ? '전체' : input.platform}</strong></span>
         <span>1명당 예산 <strong>{formatWon(input.budget)}</strong></span>
         <span>카테고리 <strong>{input.categories.join(', ')}</strong></span>
         <span>규모 <strong>{input.tier}</strong></span>

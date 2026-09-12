@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
-import { CATEGORIES, TIERS } from '../domain/types';
-import type { Category, Tier } from '../domain/types';
+import { CATEGORIES, PLATFORMS, TIERS } from '../domain/types';
+import type { Category, Platform, Tier } from '../domain/types';
 import { TIER_INFO } from '../domain/tiers';
 import { formatWon } from '../domain/format';
 import { formatBudgetText, parseBudgetText, validateForm } from '../domain/searchForm';
@@ -70,6 +70,7 @@ export function SearchPanel({ value, onChange, onSubmit }: Props) {
     onChange({ ...value, tier: t });
     setTouched((s) => ({ ...s, tier: true }));
   };
+  const pickPlatform = (platform: 'all' | Platform) => onChange({ ...value, platform });
 
   return (
     <form
@@ -81,9 +82,29 @@ export function SearchPanel({ value, onChange, onSubmit }: Props) {
       }}
     >
       <div className="panel__grid">
-        <div className="field">
+        <div className="field field--platform">
+          <div className="field__label" id="platform-label">플랫폼</div>
+          <div className="segment panel__platform" role="radiogroup" aria-labelledby="platform-label">
+            {(['all', ...PLATFORMS] as const).map((platform) => {
+              const on = value.platform === platform;
+              return (
+                <button
+                  key={platform}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  className={`segment__item${on ? ' is-on' : ''}`}
+                  onClick={() => pickPlatform(platform)}
+                >
+                  {platform === 'all' ? '전체' : platform}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="field field--budget">
           <label className="field__label" htmlFor="budget">크리에이터 1명당 섭외 예산</label>
-          <p className="field__help">한 명에게 쓸 수 있는 최대 금액입니다. 이 금액 이하로 진행 가능한 크리에이터를 찾아드립니다.</p>
           <div className="budget">
             <input
               id="budget"
@@ -104,23 +125,7 @@ export function SearchPanel({ value, onChange, onSubmit }: Props) {
           {touched.budget && errors.budget && <p className="field__error" role="alert">{errors.budget}</p>}
         </div>
 
-        <div className="field">
-          <div className="field__label" id="categories-label">캠페인 카테고리 (여러 개 선택 가능)</div>
-          <p className="field__help">광고할 제품이나 서비스와 맞는 분야를 고르세요.</p>
-          <div className="chips" role="group" aria-labelledby="categories-label">
-            {CATEGORIES.map((c) => {
-              const on = value.categories.includes(c);
-              return (
-                <button key={c} type="button" className={`chip chip--toggle${on ? ' is-on' : ''}`} aria-pressed={on} onClick={() => toggleCategory(c)}>
-                  {c}
-                </button>
-              );
-            })}
-          </div>
-          {touched.categories && errors.categories && <p className="field__error" role="alert">{errors.categories}</p>}
-        </div>
-
-        <div className="field">
+        <div className="field field--tier">
           <div className="field__label" id="tier-label">크리에이터 규모 (구독자·팔로워 수 기준)</div>
           <div className="tiers" role="radiogroup" aria-labelledby="tier-label">
             {TIERS.map((t) => {
@@ -136,8 +141,26 @@ export function SearchPanel({ value, onChange, onSubmit }: Props) {
           </div>
           {touched.tier && errors.tier && <p className="field__error" role="alert">{errors.tier}</p>}
         </div>
+
+        <div className="field field--categories">
+          <div className="field__label" id="categories-label">캠페인 카테고리 (여러 개 선택 가능)</div>
+          <div className="chips" role="group" aria-labelledby="categories-label">
+            {CATEGORIES.map((c) => {
+              const on = value.categories.includes(c);
+              return (
+                <button key={c} type="button" className={`chip chip--toggle${on ? ' is-on' : ''}`} aria-pressed={on} onClick={() => toggleCategory(c)}>
+                  {c}
+                </button>
+              );
+            })}
+          </div>
+          {touched.categories && errors.categories && <p className="field__error" role="alert">{errors.categories}</p>}
+        </div>
+
+        <div className="panel__submit-wrap">
+          <button type="submit" className="btn btn--primary panel__submit" disabled={!canSubmit}>크리에이터 찾기</button>
+        </div>
       </div>
-      <button type="submit" className="btn btn--primary panel__submit" disabled={!canSubmit}>크리에이터 찾기</button>
     </form>
   );
 }

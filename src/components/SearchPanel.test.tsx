@@ -44,3 +44,14 @@ describe('SearchPanel 크리에이터 규모 카드', () => {
     expect(screen.queryByText(/단가/)).not.toBeInTheDocument();
   });
 });
+
+describe('SearchPanel 플랫폼 검색 조건', () => {
+  it('전체가 기본값이고 유튜브를 검색 전에 선택할 수 있다', async () => {
+    render(<Harness />);
+    const user = userEvent.setup();
+
+    expect(screen.getByRole('radio', { name: '전체' })).toHaveAttribute('aria-checked', 'true');
+    await user.click(screen.getByRole('radio', { name: '유튜브' }));
+    expect(screen.getByRole('radio', { name: '유튜브' })).toHaveAttribute('aria-checked', 'true');
+  });
+});

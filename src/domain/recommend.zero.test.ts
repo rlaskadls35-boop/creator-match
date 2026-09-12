@@ -7,7 +7,7 @@ import { diagnoseZeroResult, buildRelaxations, nearCandidates, filterCandidates,
 import type { SearchInput } from './recommend';
 
 const ranked = rankCreators(scoreCreators(parseCreators(csvText).creators), DEFAULT_WEIGHTS);
-const Q: SearchInput = { budget: 500_000, categories: ['뷰티'], tier: '매크로' };
+const Q: SearchInput = { platform: 'all', budget: 500_000, categories: ['뷰티'], tier: '매크로' };
 
 describe('diagnoseZeroResult: 뷰티 / 매크로 / 50만 (설계 §5.7, §8.7)', () => {
   const info = diagnoseZeroResult(ranked, Q);
@@ -69,7 +69,7 @@ describe('diagnoseZeroResult: 그 밖의 경우', () => {
       'S3,매크로게임,게임,유튜브,200000,80000,5.0,10,40000000,4000000,4.8',
     ];
     const small = rankCreators(scoreCreators(parseCreators(HEADER + '\n' + rows.join('\n') + '\n').creators), DEFAULT_WEIGHTS);
-    const info = diagnoseZeroResult(small, { budget: 5_000_000, categories: ['뷰티'], tier: '매크로' });
+    const info = diagnoseZeroResult(small, { platform: 'all', budget: 5_000_000, categories: ['뷰티'], tier: '매크로' });
     expect(info.diagnosis).toBe('선택한 카테고리에는 매크로 이력 있는 크리에이터가 없습니다.');
     expect(info.relaxations.find((r) => r.id === 'budget')).toBeUndefined();
     expect(info.relaxations.find((r) => r.id === 'category')!.count).toBe(1); // 매크로게임
@@ -77,7 +77,7 @@ describe('diagnoseZeroResult: 그 밖의 경우', () => {
   });
 
   it('예산 5만 원에서는 예산만 어긋난 뷰티·매크로 4명 중 상위 3명이 근접 후보가 된다', () => {
-    const near = nearCandidates(ranked, { budget: 50_000, categories: ['뷰티'], tier: '매크로' });
+    const near = nearCandidates(ranked, { platform: 'all', budget: 50_000, categories: ['뷰티'], tier: '매크로' });
     // 예산 5만 원은 아무도 못 맞추므로, 예산만 어긋난 사람 = 뷰티·매크로 4명
     expect(near.every((n) => n.change.startsWith('예산을'))).toBe(true);
     expect(near).toHaveLength(3);
@@ -86,12 +86,30 @@ describe('diagnoseZeroResult: 그 밖의 경우', () => {
 
 describe('buildRelaxations: 후보 1~2명 (설계 §5.7 마지막)', () => {
   it('뷰티 / 매크로 / 310만 → 후보 1명, 예산 제안은 다음 사람 658만 원 → 2명', () => {
-    const q: SearchInput = { budget: 3_100_000, categories: ['뷰티'], tier: '매크로' };
+    const q: SearchInput = { platform: 'all', budget: 3_100_000, categories: ['뷰티'], tier: '매크로' };
     const cands = filterCandidates(ranked, q);
     expect(cands).toHaveLength(1);
     expect(cands.length).toBeLessThan(FEW_RESULTS_THRESHOLD);
     const budget = buildRelaxations(ranked, q).find((r) => r.id === 'budget')!;
     expect(budget.label).toBe('예산을 658만 원으로 올리면');
     expect(budget.count).toBe(2);
+  });
+});
+
+describe('플랫폼 조건 완화', () => {
+  it('선택 플랫폼에 후보가 없으면 전체 플랫폼으로 넓히는 선택지와 근접 후보를 제시한다', () => {
+    const HEADER =
+      'creator_id,creator_name,category,platform,followers,avg_view_count,engagement_rate,total_campaign_count,total_campaign_budget_krw,avg_campaign_budget_krw,advertiser_rating';
+    const row = 'P1,유튜브나노,뷰티,유튜브,5000,1000,7.0,2,600000,300000,4.5';
+    const small = rankCreators(scoreCreators(parseCreators(`${HEADER}\n${row}\n`).creators), DEFAULT_WEIGHTS);
+    const q: SearchInput = { platform: '인스타그램', budget: 500_000, categories: ['뷰티'], tier: '나노' };
+    const info = diagnoseZeroResult(small, q);
+    const platform = info.relaxations.find((r) => r.id === 'platform')!;
+
+    expect(info.diagnosis).toBe('선택한 플랫폼·카테고리에는 나노 이력 있는 크리에이터가 없습니다.');
+    expect(platform.label).toBe('플랫폼을 전체로 넓히면');
+    expect(platform.count).toBe(1);
+    expect(platform.nextInput.platform).toBe('all');
+    expect(info.nearCandidates[0].change).toBe('플랫폼을 유튜브로');
   });
 });

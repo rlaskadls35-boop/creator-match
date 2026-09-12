@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Noto Sans KR', system-ui, -apple-system, 'Apple SD Gothic Neo', sans-serif; background: #F4F7FF; color: #0F172A; font-size: 15px; line-height: 1.5; }
+    * { box-sizing: border-box; }
+    button { font: inherit; }
+    a { color: #2563EB; } a:hover { color: #1E3A8A; }
+  </style>
+</helmet>
+
+<div style="min-height: 100%; background: #F4F7FF; padding-bottom: 32px;">
+
+  <!-- 헤더: 기존 화면 그대로 -->
+  <div style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="display: inline-flex; border-radius: 11px;">
+        <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true">
+          <rect width="36" height="36" rx="11" fill="#2563EB"></rect>
+          <path d="M11 22.5c3.2 0 4.6-3.1 5.7-6.1 1.1-3 2.2-5.9 5.3-5.9 2.5 0 4 1.9 4 4.4" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"></path>
+          <circle cx="24.5" cy="23.5" r="2.3" fill="#fff"></circle>
+        </svg>
+      </span>
+      <div style="font-weight: 700; font-size: 20px; color: #1E3A8A; line-height: 1.2;">Creator Match 운영자 화면</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-size: 14px; color: #64748B;">admin</span>
+      <button type="button" style="border: 1px solid #E3E9F6; background: transparent; color: #0F172A; padding: 10px 16px; border-radius: 12px; cursor: pointer;">로그아웃</button>
+    </div>
+  </div>
+
+  <div style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+
+    <!-- 검색 카드: 위에서 아래로 한 줄에 한 조건 -->
+    <div style="background: #FFFFFF; border-radius: 22px; box-shadow: 0 8px 24px rgba(37, 99, 235, 0.08); padding: 10px 24px 12px;">
+
+      <!-- 플랫폼 -->
+      <div style="display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: center; padding: 16px 0;">
+        <div style="font-weight: 700; font-size: 13.5px; color: #0F172A;">플랫폼</div>
+        <div style="display: inline-flex; border: 1px solid #E3E9F6; border-radius: 999px; background: #fff; padding: 3px; justify-self: start;">
+          <button type="button" style="border: 0; background: #2563EB; color: #fff; font-weight: 700; padding: 6px 18px; border-radius: 999px; cursor: pointer; font-size: 14px;">전체</button>
+          <button type="button" style="border: 0; background: transparent; color: #64748B; padding: 6px 18px; border-radius: 999px; cursor: pointer; font-size: 14px;">유튜브</button>
+          <button type="button" style="border: 0; background: transparent; color: #64748B; padding: 6px 18px; border-radius: 999px; cursor: pointer; font-size: 14px;">인스타그램</button>
+        </div>
+      </div>
+
+      <!-- 예산 -->
+      <div style="display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: center; padding: 16px 0; border-top: 1px solid #E3E9F6;">
+        <div>
+          <div style="font-weight: 700; font-size: 13.5px; color: #0F172A;">크리에이터 1명당 섭외 예산</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="text" value="500,000" style="width: 220px; min-height: 44px; border: 1px solid #E3E9F6; border-radius: 12px; padding: 10px 12px; font: inherit; font-size: 15px; background: #fff; color: #0F172A;">
+          <span style="color: #64748B;">원</span>
+          <span style="margin-left: 6px; color: #1E3A8A; font-size: 12.5px; font-weight: 700;">→ 50만 원</span>
+        </div>
+      </div>
+
+      <!-- 규모 -->
+      <div style="display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: start; padding: 16px 0; border-top: 1px solid #E3E9F6;">
+        <div style="padding-top: 2px;">
+          <div style="font-weight: 700; font-size: 13.5px; color: #0F172A;">크리에이터 규모</div>
+          <p style="margin: 2px 0 0; font-size: 13px; color: #64748B;">구독자·팔로워 수 기준</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; max-width: 560px;">
+          <button type="button" style="display: flex; flex-direction: column; gap: 1px; min-height: 62px; text-align: left; padding: 9px 12px; border: 1.5px solid #2563EB; border-radius: 12px; background: #DBEAFE; cursor: pointer; color: #0F172A;">
+            <span style="font-weight: 700; font-size: 14px;">나노</span>
+            <span style="font-size: 11.5px; color: #1E3A8A; font-weight: 500;">1만 미만</span>
+          </button>
+          <button type="button" style="display: flex; flex-direction: column; gap: 1px; min-height: 62px; text-align: left; padding: 9px 12px; border: 1.5px solid #E3E9F6; border-radius: 12px; background: #fff; cursor: pointer; color: #0F172A;">
+            <span style="font-weight: 700; font-size: 14px;">마이크로</span>
+            <span style="font-size: 11.5px; color: #1E3A8A; font-weight: 500;">1만~10만</span>
+          </button>
+          <button type="button" style="display: flex; flex-direction: column; gap: 1px; min-height: 62px; text-align: left; padding: 9px 12px; border: 1.5px solid #E3E9F6; border-radius: 12px; background: #fff; cursor: pointer; color: #0F172A;">
+            <span style="font-weight: 700; font-size: 14px;">매크로</span>
+            <span style="font-size: 11.5px; color: #1E3A8A; font-weight: 500;">10만 이상</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 카테고리 -->
+      <div style="display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: start; padding: 16px 0; border-top: 1px solid #E3E9F6;">
+        <div style="padding-top: 2px;">
+          <div style="font-weight: 700; font-size: 13.5px; color: #0F172A;">캠페인 카테고리</div>
+          <p style="margin: 2px 0 0; font-size: 13px; color: #64748B;">여러 개 선택 가능</p>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          <button type="button" style="display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 999px; font-size: 13px; border: 1px solid #2563EB; background: #2563EB; color: #fff; font-weight: 700; line-height: 1.4; cursor: pointer;">뷰티</button>
+          <button type="button" style="display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 999px; font-size: 13px; border: 1px solid #E3E9F6; background: #fff; color: #0F172A; line-height: 1.4; cursor: pointer;">식품</button>
+          <button type="button" style="display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 999px; font-size: 13px; border: 1px solid #E3E9F6; background: #fff; color: #0F172A; line-height: 1.4; cursor: pointer;">패션</button>
+          <button type="button" style="display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 999px; font-size: 13px; border: 1px solid #E3E9F6; background: #fff; color: #0F172A; line-height: 1.4; cursor: pointer;">피트니스</button>
+          <button type="button" style="display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 999px; font-size: 13px; border: 1px solid #E3E9F6; background: #fff; color: #0F172A; line-height: 1.4; cursor: pointer;">여행</button>
+          <button type="button" style="display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 999px; font-size: 13px; border: 1px solid #E3E9F6; background: #fff; color: #0F172A; line-height: 1.4; cursor: pointer;">아웃도어</button>
+          <button type="button" style="display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 999px; font-size: 13px; border: 1px solid #E3E9F6; background: #fff; color: #0F172A; line-height: 1.4; cursor: pointer;">라이프스타일</button>
+          <button type="button" style="display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 999px; font-size: 13px; border: 1px solid #E3E9F6; background: #fff; color: #0F172A; line-height: 1.4; cursor: pointer;">테크</button>
+          <button type="button" style="display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 999px; font-size: 13px; border: 1px solid #E3E9F6; background: #fff; color: #0F172A; line-height: 1.4; cursor: pointer;">게임</button>
+          <button type="button" style="display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 999px; font-size: 13px; border: 1px solid #E3E9F6; background: #fff; color: #0F172A; line-height: 1.4; cursor: pointer;">교육</button>
+        </div>
+      </div>
+
+      <!-- 마무리 줄: 고른 조건 한 줄 + 찾기 버튼 -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; padding: 18px 0 10px; border-top: 1px solid #E3E9F6;">
+        <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: #64748B;">
+          <span>플랫폼 <strong style="color: #0F172A; font-weight: 600;">전체</strong></span>
+          <span>1명당 예산 <strong style="color: #0F172A; font-weight: 600;">50만 원</strong></span>
+          <span>규모 <strong style="color: #0F172A; font-weight: 600;">나노</strong></span>
+          <span>카테고리 <strong style="color: #0F172A; font-weight: 600;">뷰티</strong></span>
+        </div>
+        <button type="button" style="background: #2563EB; border: 1px solid #2563EB; color: #fff; font-weight: 700; min-height: 48px; padding: 12px 32px; border-radius: 12px; font-size: 15px; cursor: pointer;">크리에이터 찾기</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1200,"height":560}}'>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>
