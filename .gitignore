@@ -9,3 +9,6 @@ coverage/
 # editor
 .vscode/
 .idea/
+
+# superpowers SDD scratch (ledger, briefs, review packages)
+.superpowers/
