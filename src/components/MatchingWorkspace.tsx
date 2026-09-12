@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import type { DatasetStats, ScoredCreator, Weights } from '../domain/types';
 import { matchScore, rankCreators } from '../domain/scoring';
 import { filterCandidates, sortCandidates, applyResultFilters, DEFAULT_SORT, DEFAULT_FILTERS, SORT_DEFAULT_DIRECTION, filterNewCandidates, sortNewCandidates } from '../domain/recommend';
@@ -24,10 +25,12 @@ interface Props {
   savedWeights?: Weights;
   /** 운영자 화면 결과 줄에 붙는 미리보기 상태 문구 */
   previewNote?: { text: string; waiting: boolean };
+  /** 검색 조건과 결과 사이에 배치할 운영자 전용 설정 UI */
+  afterSearchPanel?: ReactNode;
 }
 
 /** 광고주 화면과 운영자 화면이 공유하는 "입력 패널 + 결과" 블록. 비중만 다르게 받는다 */
-export function MatchingWorkspace({ creators, stats, weights, variant = 'advertiser', savedWeights, previewNote }: Props) {
+export function MatchingWorkspace({ creators, stats, weights, variant = 'advertiser', savedWeights, previewNote, afterSearchPanel }: Props) {
   const admin = variant === 'admin';
   const ranked = useMemo(() => rankCreators(creators, weights), [creators, weights]);
   const [form, setForm] = useState<SearchFormState>(EMPTY_FORM);
@@ -87,6 +90,7 @@ export function MatchingWorkspace({ creators, stats, weights, variant = 'adverti
   return (
     <>
       <SearchPanel value={form} onChange={setForm} onSubmit={handleSubmit} />
+      {afterSearchPanel}
       {admin && query && <ConditionSummary input={query} note={previewNote} />}
       <section className="results">
         {query === null ? (

@@ -22,6 +22,18 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     localStorage.setItem(SESSION_KEY, '1');
   });
 
+  it('크리에이터 찾기, 비중 조절, 결과 순서로 표시한다', () => {
+    if (!data.ok) throw new Error('데이터 로드 실패');
+    render(<AdminPage data={data} />);
+
+    const searchButton = screen.getByRole('button', { name: '크리에이터 찾기' });
+    const weightsTitle = screen.getByRole('heading', { name: '매칭 점수 비중 조절' });
+    const resultsGuide = screen.getByText('조건을 입력하고 크리에이터 찾기를 누르세요');
+
+    expect(searchButton.compareDocumentPosition(weightsTitle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(weightsTitle.compareDocumentPosition(resultsGuide) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('합계가 100이 아닌 동안에는 미리보기가 멈추고, 100을 맞추면 갱신된다', async () => {
     if (!data.ok) throw new Error('데이터 로드 실패');
     render(<AdminPage data={data} />);

@@ -63,25 +63,25 @@ export function AdminPage({ data }: { data: LoadedData }) {
       <Header variant="admin" accountName={ADMIN_ACCOUNT.id} onLogout={handleLogout} />
       <main className="main">
         {data.ok ? (
-          <>
-            <WeightsCard
-              draft={draft}
-              saved={saved}
-              onChange={handleChange}
-              onSave={handleSave}
-              onCancel={handleCancel}
-              onDefault={handleDefault}
-              message={message}
-            />
-            <MatchingWorkspace
-              variant="admin"
-              creators={data.creators}
-              stats={data.stats}
-              weights={preview}
-              savedWeights={saved}
-              previewNote={previewNote}
-            />
-          </>
+          <MatchingWorkspace
+            variant="admin"
+            creators={data.creators}
+            stats={data.stats}
+            weights={preview}
+            savedWeights={saved}
+            previewNote={previewNote}
+            afterSearchPanel={(
+              <WeightsCard
+                draft={draft}
+                saved={saved}
+                onChange={handleChange}
+                onSave={handleSave}
+                onCancel={handleCancel}
+                onDefault={handleDefault}
+                message={message}
+              />
+            )}
+          />
         ) : (
           <section className="card error" role="alert">{data.message}</section>
         )}
