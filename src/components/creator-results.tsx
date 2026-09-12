@@ -15,6 +15,9 @@ export default function CreatorResults({ creators, unknownBudgetCount }: { creat
         <div className="table-scroll" role="region" aria-label="조건에 맞는 크리에이터 목록" tabIndex={0}>
           <table className="creator-table">
             <caption className="visually-hidden">선택한 캠페인 조건에 맞는 크리에이터 {creators.length}명</caption>
+            <colgroup>
+              {[16, 9, 10, 14, 11, 11, 8, 11, 10].map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}
+            </colgroup>
             <thead>
               <tr>
                 <th scope="col">크리에이터</th>
