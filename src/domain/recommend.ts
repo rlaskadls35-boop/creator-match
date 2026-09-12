@@ -99,13 +99,6 @@ export interface NearCandidate {
   change: string;
 }
 
-export interface ZeroResultInfo {
-  diagnosis: string;
-  extraNote: string | null;
-  relaxations: Relaxation[];
-  nearCandidates: NearCandidate[];
-}
-
 function minRate(list: { rate: number }[]): number | null {
   return list.length ? Math.min(...list.map((c) => c.rate)) : null;
 }
@@ -191,24 +184,6 @@ export function nearCandidates(all: RankedCreator[], input: SearchInput, limit =
     out.push({ creator: c, change });
   }
   return out.sort((a, b) => compareByMatch(a.creator, b.creator)).slice(0, limit);
-}
-
-export function diagnoseZeroResult(all: RankedCreator[], input: SearchInput): ZeroResultInfo {
-  const platformLabel = input.platform === 'all' ? '' : `${input.platform} · `;
-  const A = all.filter((c) => matchesPlatform(c, input.platform) && input.categories.includes(c.category) && c.tier === input.tier);
-  const diagnosis =
-    A.length === 0
-      ? input.platform === 'all'
-        ? `선택한 카테고리에는 ${input.tier} 이력 있는 크리에이터가 없습니다.`
-        : `선택한 플랫폼·카테고리에는 ${input.tier} 이력 있는 크리에이터가 없습니다.`
-      : `${platformLabel}${input.categories.join('·')} 카테고리의 ${input.tier} 이력 있는 크리에이터는 ${A.length}명 있지만, 모두 단가가 예산 ${formatWon(input.budget)}을 넘습니다. 가장 낮은 단가는 ${formatWon(minRate(A) as number)}입니다.`;
-  const platformPool = all.filter((c) => matchesPlatform(c, input.platform));
-  const anyAffordable = platformPool.some((c) => c.rate <= input.budget);
-  const lowest = minRate(platformPool);
-  const extraNote = anyAffordable || lowest === null
-    ? null
-    : `${input.platform === 'all' ? '이력 있는 크리에이터' : `선택한 플랫폼의 이력 있는 크리에이터`}의 최저 단가는 ${formatWon(lowest)}입니다.`;
-  return { diagnosis, extraNote, relaxations: buildRelaxations(all, input), nearCandidates: nearCandidates(all, input) };
 }
 
 /** 단가가 없어 예산 통과를 판단할 수 없는 신규 후보. 카테고리·규모만 적용한다. */
