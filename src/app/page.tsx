@@ -6,6 +6,8 @@ import {
 } from "lucide-react";
 
 const categories = ["뷰티", "식품", "패션", "피트니스", "여행", "아웃도어", "라이프스타일", "테크", "게임", "교육"];
+const platforms = ["전체", "유튜브", "인스타그램"] as const;
+type Platform = typeof platforms[number];
 const sizes = [
   { id: "nano", name: "나노", range: "1만 미만", bars: 1 },
   { id: "micro", name: "마이크로", range: "1만 이상 ~ 10만 미만", bars: 2 },
@@ -28,6 +30,7 @@ function koreanAmount(amount: number) {
 export default function Home() {
   const [budget, setBudget] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [platform, setPlatform] = useState<Platform>("전체");
   const [size, setSize] = useState<Size | "">("");
   const [errors, setErrors] = useState<FormErrors>({});
   const [confirmed, setConfirmed] = useState(false);
@@ -52,6 +55,7 @@ export default function Home() {
   function resetForm() {
     setBudget("");
     setSelectedCategories([]);
+    setPlatform("전체");
     setSize("");
     setErrors({});
     setConfirmed(false);
@@ -140,6 +144,22 @@ export default function Home() {
                   {errors.category && <p className="field-error" id="category-error">{errors.category}</p>}
                 </div>
 
+                <fieldset className="form-section platform-section" aria-describedby="platform-description">
+                  <legend className="field-label">플랫폼</legend>
+                  <p className="field-description" id="platform-description">크리에이터가 활동하는 플랫폼을 선택해 주세요.</p>
+                  <div className="platform-options">
+                    {platforms.map((option) => (
+                      <label key={option} className={`platform-option ${platform === option ? "is-selected" : ""}`}>
+                        <input
+                          type="radio" name="platform" value={option} checked={platform === option}
+                          onChange={() => { setPlatform(option); setConfirmed(false); }}
+                        />
+                        <span>{option}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+
                 <fieldset className={`form-section follower-section ${errors.size ? "follower-error" : ""}`} aria-describedby={`size-description${errors.size ? " size-error" : ""}`}>
                   <legend className="field-label">팔로워 규모 <span>*</span></legend>
                   <p className="field-description" id="size-description">함께하고 싶은 크리에이터의 규모를 선택해 주세요.</p>
@@ -163,7 +183,7 @@ export default function Home() {
                 <button className="reset-button" type="button" onClick={resetForm}><RotateCcw size={15} />초기화</button>
                 <button className="primary-button" type="submit">조건 확인하기<ArrowRight size={18} /></button>
               </div>
-              {confirmed && <div className="confirmation" role="status"><CircleCheck size={19} /><div><strong>캠페인 조건이 준비됐어요.</strong><p>예산과 카테고리, 팔로워 규모가 모두 입력됐어요.</p></div><button type="button" aria-label="확인 메시지 닫기" onClick={() => setConfirmed(false)}><X size={16} /></button></div>}
+              {confirmed && <div className="confirmation" role="status"><CircleCheck size={19} /><div><strong>캠페인 조건이 준비됐어요.</strong><p>예산과 카테고리, 플랫폼({platform}), 팔로워 규모를 확인했어요.</p></div><button type="button" aria-label="확인 메시지 닫기" onClick={() => setConfirmed(false)}><X size={16} /></button></div>}
             </form>
           </section>
 

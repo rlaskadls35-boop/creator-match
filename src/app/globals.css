@@ -67,11 +67,16 @@ svg { flex-shrink: 0; }
 .category-button.is-selected { border-color: var(--blue); background: var(--blue-light); color: var(--blue-dark); }
 .category-check { display: grid; place-items: center; width: 15px; height: 15px; border: 1px solid #d8dfeb; border-radius: 4px; background: white; }
 .category-button.is-selected .category-check { border-color: var(--blue); background: var(--blue); color: white; }
-.follower-section { border: 0; padding: 0; min-width: 0; margin-left: 0; margin-right: 0; margin-bottom: 0; }
-.follower-section legend { padding: 0; }
+.follower-section, .platform-section { border: 0; padding: 0; min-width: 0; margin-left: 0; margin-right: 0; margin-bottom: 0; }
+.follower-section legend, .platform-section legend { padding: 0; }
+.platform-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; width: min(100%, 420px); padding: 4px; border: 1px solid var(--border); border-radius: 9px; background: var(--background); }
+.platform-option { position: relative; display: flex; align-items: center; justify-content: center; min-height: 40px; padding: 10px 12px; border: 1px solid transparent; border-radius: 6px; color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.platform-option:hover { background: #eaf1fc; color: var(--blue-dark); }
+.platform-option.is-selected { border-color: var(--blue); background: white; color: var(--blue-dark); font-weight: 650; }
+.platform-option:has(input:focus-visible) { outline: 3px solid #86b3ff; outline-offset: 2px; }
 .size-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .size-option { position: relative; padding: 15px 14px 16px; border: 1px solid #e0e6ef; border-radius: 9px; background: white; cursor: pointer; transition: border-color .15s, background .15s; }
-.size-option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.size-option input, .platform-option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .size-option:hover { border-color: #93b6f8; background: #fafcff; }
 .size-option.is-selected { background: #f1f6ff; border-color: var(--blue); box-shadow: inset 0 0 0 .5px var(--blue); }
 .size-option:has(input:focus-visible) { outline: 3px solid #86b3ff; outline-offset: 3px; }
