@@ -81,83 +81,107 @@ export function SearchPanel({ value, onChange, onSubmit }: Props) {
         if (canSubmit) onSubmit();
       }}
     >
-      <div className="panel__grid">
+      <div className="panel__rows">
         <div className="field field--platform">
-          <div className="field__label" id="platform-label">플랫폼</div>
-          <div className="segment panel__platform" role="radiogroup" aria-labelledby="platform-label">
-            {(['all', ...PLATFORMS] as const).map((platform) => {
-              const on = value.platform === platform;
-              return (
-                <button
-                  key={platform}
-                  type="button"
-                  role="radio"
-                  aria-checked={on}
-                  className={`segment__item${on ? ' is-on' : ''}`}
-                  onClick={() => pickPlatform(platform)}
-                >
-                  {platform === 'all' ? '전체' : platform}
-                </button>
-              );
-            })}
+          <div className="field__head">
+            <div className="field__label" id="platform-label">플랫폼</div>
+          </div>
+          <div className="field__control">
+            <div className="segment panel__platform" role="radiogroup" aria-labelledby="platform-label">
+              {(['all', ...PLATFORMS] as const).map((platform) => {
+                const on = value.platform === platform;
+                return (
+                  <button
+                    key={platform}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    className={`segment__item${on ? ' is-on' : ''}`}
+                    onClick={() => pickPlatform(platform)}
+                  >
+                    {platform === 'all' ? '전체' : platform}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
         <div className="field field--budget">
-          <label className="field__label" htmlFor="budget">크리에이터 1명당 섭외 예산</label>
-          <div className="budget">
-            <input
-              id="budget"
-              ref={budgetRef}
-              className="input"
-              inputMode="numeric"
-              autoComplete="off"
-              placeholder="예: 1,500,000"
-              value={value.budgetText}
-              onChange={handleBudgetChange}
-              onBlur={() => setTouched((t) => ({ ...t, budget: true }))}
-              aria-invalid={touched.budget && !!errors.budget}
-              aria-describedby="budget-preview"
-            />
-            <span className="budget__unit">원</span>
-            <span id="budget-preview" className="budget__preview">{budget !== null ? `→ ${formatWon(budget)}` : ''}</span>
+          <div className="field__head">
+            <label className="field__label" htmlFor="budget">크리에이터 1명당 섭외 예산</label>
           </div>
-          {touched.budget && errors.budget && <p className="field__error" role="alert">{errors.budget}</p>}
+          <div className="field__control">
+            <div className="budget">
+              <input
+                id="budget"
+                ref={budgetRef}
+                className="input"
+                inputMode="numeric"
+                autoComplete="off"
+                placeholder="예: 1,500,000"
+                value={value.budgetText}
+                onChange={handleBudgetChange}
+                onBlur={() => setTouched((t) => ({ ...t, budget: true }))}
+                aria-invalid={touched.budget && !!errors.budget}
+                aria-describedby="budget-preview"
+              />
+              <span className="budget__unit">원</span>
+              <span id="budget-preview" className="budget__preview">{budget !== null ? `→ ${formatWon(budget)}` : ''}</span>
+            </div>
+            {touched.budget && errors.budget && <p className="field__error" role="alert">{errors.budget}</p>}
+          </div>
         </div>
 
         <div className="field field--tier">
-          <div className="field__label" id="tier-label">크리에이터 규모 (구독자·팔로워 수 기준)</div>
-          <div className="tiers" role="radiogroup" aria-labelledby="tier-label">
-            {TIERS.map((t) => {
-              const on = value.tier === t;
-              const info = TIER_INFO[t];
-              return (
-                <button key={t} type="button" role="radio" aria-checked={on} className={`tier-card${on ? ' is-on' : ''}`} onClick={() => pickTier(t)}>
-                  <span className="tier-card__name">{t}</span>
-                  <span className="tier-card__range">{info.range}</span>
-                </button>
-              );
-            })}
+          <div className="field__head">
+            <div className="field__label" id="tier-label">크리에이터 규모</div>
+            <p className="field__help" id="tier-help">구독자·팔로워 수 기준</p>
           </div>
-          {touched.tier && errors.tier && <p className="field__error" role="alert">{errors.tier}</p>}
+          <div className="field__control">
+            <div className="tiers" role="radiogroup" aria-labelledby="tier-label tier-help">
+              {TIERS.map((t) => {
+                const on = value.tier === t;
+                const info = TIER_INFO[t];
+                return (
+                  <button key={t} type="button" role="radio" aria-checked={on} className={`tier-card${on ? ' is-on' : ''}`} onClick={() => pickTier(t)}>
+                    <span className="tier-card__name">{t}</span>
+                    <span className="tier-card__range">{info.range}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {touched.tier && errors.tier && <p className="field__error" role="alert">{errors.tier}</p>}
+          </div>
         </div>
 
         <div className="field field--categories">
-          <div className="field__label" id="categories-label">캠페인 카테고리 (여러 개 선택 가능)</div>
-          <div className="chips" role="group" aria-labelledby="categories-label">
-            {CATEGORIES.map((c) => {
-              const on = value.categories.includes(c);
-              return (
-                <button key={c} type="button" className={`chip chip--toggle${on ? ' is-on' : ''}`} aria-pressed={on} onClick={() => toggleCategory(c)}>
-                  {c}
-                </button>
-              );
-            })}
+          <div className="field__head">
+            <div className="field__label" id="categories-label">캠페인 카테고리</div>
+            <p className="field__help" id="categories-help">여러 개 선택 가능</p>
           </div>
-          {touched.categories && errors.categories && <p className="field__error" role="alert">{errors.categories}</p>}
+          <div className="field__control">
+            <div className="chips" role="group" aria-labelledby="categories-label categories-help">
+              {CATEGORIES.map((c) => {
+                const on = value.categories.includes(c);
+                return (
+                  <button key={c} type="button" className={`chip chip--toggle${on ? ' is-on' : ''}`} aria-pressed={on} onClick={() => toggleCategory(c)}>
+                    {c}
+                  </button>
+                );
+              })}
+            </div>
+            {touched.categories && errors.categories && <p className="field__error" role="alert">{errors.categories}</p>}
+          </div>
         </div>
 
-        <div className="panel__submit-wrap">
+        <div className="panel__footer">
+          <div className="panel__summary" aria-label="지금 선택한 조건">
+            <span>플랫폼 <strong>{value.platform === 'all' ? '전체' : value.platform}</strong></span>
+            <span>1명당 예산 {budget !== null ? <strong>{formatWon(budget)}</strong> : <strong className="is-empty">미입력</strong>}</span>
+            <span>규모 {value.tier !== null ? <strong>{value.tier}</strong> : <strong className="is-empty">미선택</strong>}</span>
+            <span>카테고리 {value.categories.length > 0 ? <strong>{value.categories.join(', ')}</strong> : <strong className="is-empty">미선택</strong>}</span>
+          </div>
           <button type="submit" className="btn btn--primary panel__submit" disabled={!canSubmit}>크리에이터 찾기</button>
         </div>
       </div>
