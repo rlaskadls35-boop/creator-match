@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import type { ChangeEvent } from 'react';
 import { CATEGORIES, TIERS } from '../domain/types';
 import type { Category, Tier } from '../domain/types';
 import { TIER_INFO } from '../domain/tiers';
@@ -12,12 +13,49 @@ interface Props {
   onSubmit: () => void;
 }
 
+/** 콤마 재포맷 후에도 커서를 "방금 입력한 숫자" 바로 뒤에 되돌리기 위한 위치 계산.
+ *  자릿수 구분 콤마가 그 자리에 새로 끼어들면 콤마도 건너뛴다 (설계 리뷰 지적, Task 12 수정) */
+function caretIndexForDigitsBefore(text: string, digitsBefore: number): number {
+  if (digitsBefore <= 0) return 0;
+  let count = 0;
+  let idx = text.length;
+  for (let i = 0; i < text.length; i++) {
+    if (/\d/.test(text[i])) {
+      count += 1;
+      if (count === digitsBefore) {
+        idx = i + 1;
+        break;
+      }
+    }
+  }
+  while (idx < text.length && !/\d/.test(text[idx])) idx += 1;
+  return idx;
+}
+
 export function SearchPanel({ value, onChange, onSubmit }: Props) {
   // 빨간 안내는 한 번 건드린 입력에만 보인다 (L21). 버튼 비활성은 항상 적용
   const [touched, setTouched] = useState({ budget: false, categories: false, tier: false });
   const errors = validateForm(value);
   const budget = parseBudgetText(value.budgetText);
   const canSubmit = !errors.budget && !errors.categories && !errors.tier;
+  const budgetRef = useRef<HTMLInputElement>(null);
+  const caretRef = useRef<number | null>(null);
+
+  const handleBudgetChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    const selectionStart = e.target.selectionStart ?? raw.length;
+    const digitsBefore = raw.slice(0, selectionStart).replace(/\D/g, '').length;
+    const next = formatBudgetText(raw);
+    caretRef.current = caretIndexForDigitsBefore(next, digitsBefore);
+    onChange({ ...value, budgetText: next });
+  };
+
+  useLayoutEffect(() => {
+    if (caretRef.current !== null && budgetRef.current) {
+      budgetRef.current.setSelectionRange(caretRef.current, caretRef.current);
+      caretRef.current = null;
+    }
+  }, [value.budgetText]);
 
   const toggleCategory = (c: Category) => {
     const has = value.categories.includes(c);
@@ -45,12 +83,13 @@ export function SearchPanel({ value, onChange, onSubmit }: Props) {
           <div className="budget">
             <input
               id="budget"
+              ref={budgetRef}
               className="input"
               inputMode="numeric"
               autoComplete="off"
               placeholder="예: 1,500,000"
               value={value.budgetText}
-              onChange={(e) => onChange({ ...value, budgetText: formatBudgetText(e.target.value) })}
+              onChange={handleBudgetChange}
               onBlur={() => setTouched((t) => ({ ...t, budget: true }))}
               aria-invalid={touched.budget && !!errors.budget}
               aria-describedby="budget-preview"
