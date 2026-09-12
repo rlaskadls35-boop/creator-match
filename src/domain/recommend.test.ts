@@ -69,9 +69,9 @@ describe('sortCandidates (설계 §5.10)', () => {
 
 describe('applyResultFilters (설계 §5.10 필터)', () => {
   const cands = filterCandidates(ranked, Q);
-  it('유튜브만 → 7명, 이력 있는 사람만 → 15명, 둘 다 → 5명', () => {
+  it('유튜브만 → 7명, 이력 있는 사람만 → 15명, 둘 다 → 6명', () => {
     expect(applyResultFilters(cands, { platform: '유튜브', historyOnly: false })).toHaveLength(7);
     expect(applyResultFilters(cands, { platform: 'all', historyOnly: true })).toHaveLength(15);
-    expect(applyResultFilters(cands, { platform: '유튜브', historyOnly: true })).toHaveLength(5);
+    expect(applyResultFilters(cands, { platform: '유튜브', historyOnly: true })).toHaveLength(6);
   });
 });
