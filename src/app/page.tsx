@@ -2,16 +2,16 @@
 
 import { useState, type FormEvent } from "react";
 import {
-  ArrowRight, Check, CircleCheck, Info, RotateCcw, SlidersHorizontal, X,
+  ArrowRight, Check, CircleCheck, RotateCcw, SlidersHorizontal, X,
 } from "lucide-react";
 
 const categories = ["뷰티", "식품", "패션", "피트니스", "여행", "아웃도어", "라이프스타일", "테크", "게임", "교육"];
 const platforms = ["전체", "유튜브", "인스타그램"] as const;
 type Platform = typeof platforms[number];
 const sizes = [
-  { id: "nano", name: "나노", range: "1만 미만", bars: 1 },
-  { id: "micro", name: "마이크로", range: "1만 이상 ~ 10만 미만", bars: 2 },
-  { id: "macro", name: "매크로", range: "10만 이상", bars: 3 },
+  { id: "nano", name: "나노", range: "1만 미만" },
+  { id: "micro", name: "마이크로", range: "1만 이상 ~ 10만 미만" },
+  { id: "macro", name: "매크로", range: "10만 이상" },
 ] as const;
 type Size = typeof sizes[number]["id"];
 type FormErrors = { budget?: string; category?: string; size?: string };
@@ -94,96 +94,107 @@ export default function Home() {
         <div className="workspace-grid">
           <section className="form-card" aria-labelledby="form-heading">
             <div className="form-card-header">
-              <div className="section-title"><SlidersHorizontal size={20} strokeWidth={1.8} /><h1 id="form-heading">캠페인 조건</h1></div>
-              <span className="required-caption"><span>*</span> 필수 입력</span>
+              <div className="section-title"><SlidersHorizontal size={20} strokeWidth={1.8} aria-hidden="true" /><h1 id="form-heading">캠페인 조건</h1></div>
+              <button className="reset-button" type="button" onClick={resetForm}><RotateCcw size={16} aria-hidden="true" />초기화</button>
             </div>
 
             <form onSubmit={confirmConditions} noValidate>
               <div className="form-fields">
-                <div className="form-section">
-                  <label className="field-label" htmlFor="budget">캠페인 예산 <span>*</span></label>
-                  <p className="field-description" id="budget-description">사용 가능한 캠페인 예산을 입력해 주세요.</p>
-                  <div className={`budget-input-wrap ${errors.budget ? "has-error" : ""}`}>
-                    <span className="currency-symbol" aria-hidden="true">₩</span>
-                    <input
-                      id="budget" name="budget" type="text" inputMode="numeric" autoComplete="off"
-                      placeholder="예산을 입력해 주세요" value={budget === "" ? "" : numericBudget.toLocaleString("ko-KR")}
-                      onChange={(event) => updateBudget(event.target.value)}
-                      aria-required="true" aria-invalid={Boolean(errors.budget)}
-                      aria-describedby={`budget-description budget-hint${errors.budget ? " budget-error" : ""}`}
-                    />
-                    <span className="currency-unit">원</span>
+                <div className="form-row">
+                  <div className="row-label">
+                    <label className="field-label" htmlFor="budget">예산 <span aria-hidden="true">*</span></label>
                   </div>
-                  <div className="budget-tools">
-                    <div className="quick-amounts" aria-label="예산 빠르게 추가">
-                      {[500_000, 1_000_000, 5_000_000].map((amount) => (
-                        <button key={amount} type="button" disabled={numericBudget + amount > maxBudget} onClick={() => updateBudget(String(numericBudget + amount))}>+{amount / 10_000}만</button>
+                  <div className="row-content">
+                    <div className="budget-controls">
+                      <div className={`budget-input-wrap ${errors.budget ? "has-error" : ""}`}>
+                        <input
+                          id="budget" name="budget" type="text" inputMode="numeric" autoComplete="off"
+                          placeholder="금액 입력" value={budget === "" ? "" : numericBudget.toLocaleString("ko-KR")}
+                          onChange={(event) => updateBudget(event.target.value)} required
+                          aria-invalid={Boolean(errors.budget)}
+                          aria-describedby={`budget-unit${numericBudget > 0 ? " budget-hint" : ""}${errors.budget ? " budget-error" : ""}`}
+                        />
+                        <span className="currency-unit" id="budget-unit">원</span>
+                      </div>
+                      <div className="quick-amounts" role="group" aria-label="예산 빠르게 추가">
+                        {[500_000, 1_000_000, 5_000_000].map((amount) => (
+                          <button key={amount} type="button" disabled={numericBudget + amount > maxBudget} onClick={() => updateBudget(String(numericBudget + amount))}>+{amount / 10_000}만</button>
+                        ))}
+                      </div>
+                    </div>
+                    {numericBudget > 0 && <p className="amount-hint" id="budget-hint">{koreanAmount(numericBudget)}</p>}
+                    {errors.budget && <p className="field-error" id="budget-error">{errors.budget}</p>}
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="row-label">
+                    <span className="field-label" id="category-label">카테고리 <span aria-hidden="true">*</span></span>
+                    <span className="field-note" id="category-note">여러 개 선택</span>
+                  </div>
+                  <div className="row-content">
+                    <div className="category-buttons" role="group" aria-labelledby="category-label" aria-describedby={`category-note${errors.category ? " category-error" : ""}`}>
+                      {categories.map((category, index) => (
+                        <button
+                          key={category} id={`category-${index}`} type="button"
+                          className={`category-button ${selectedCategories.includes(category) ? "is-selected" : ""} ${errors.category ? "has-error" : ""}`}
+                          aria-pressed={selectedCategories.includes(category)}
+                          onClick={() => toggleCategory(category)}
+                        >
+                          <span className="category-check" aria-hidden="true">{selectedCategories.includes(category) && <Check size={12} strokeWidth={2.5} />}</span>
+                          {category}
+                        </button>
                       ))}
                     </div>
-                    <span className="amount-hint" id="budget-hint">{numericBudget > 0 ? koreanAmount(numericBudget) : "원 단위로 입력"}</span>
+                    {errors.category && <p className="field-error" id="category-error">{errors.category}</p>}
                   </div>
-                  {errors.budget && <p className="field-error" id="budget-error">{errors.budget}</p>}
                 </div>
 
-                <div className="form-section">
-                  <div className="label-row"><span className="field-label" id="category-label">카테고리 <span>*</span></span><span className="optional-tag">여러 개 선택 가능</span></div>
-                  <p className="field-description" id="category-description">브랜드나 제품과 관련된 카테고리를 선택해 주세요.</p>
-                  <div className="category-buttons" role="group" aria-labelledby="category-label" aria-describedby={`category-description${errors.category ? " category-error" : ""}`}>
-                    {categories.map((category, index) => (
-                      <button
-                        key={category} id={`category-${index}`} type="button"
-                        className={`category-button ${selectedCategories.includes(category) ? "is-selected" : ""} ${errors.category ? "has-error" : ""}`}
-                        aria-pressed={selectedCategories.includes(category)}
-                        onClick={() => toggleCategory(category)}
-                      >
-                        <span className="category-check" aria-hidden="true">{selectedCategories.includes(category) && <Check size={12} strokeWidth={2.5} />}</span>
-                        {category}
-                      </button>
-                    ))}
+                <div className="form-row">
+                  <div className="row-label"><span className="field-label" id="platform-label">플랫폼</span></div>
+                  <div className="row-content">
+                    <div className="platform-options" role="radiogroup" aria-labelledby="platform-label">
+                      {platforms.map((option) => (
+                        <label key={option} className={`choice-button ${platform === option ? "is-selected" : ""}`}>
+                          <input
+                            type="radio" name="platform" value={option} checked={platform === option}
+                            onChange={() => { setPlatform(option); setConfirmed(false); }}
+                          />
+                          <span className="choice-check" aria-hidden="true">{platform === option && <Check size={16} strokeWidth={2.5} />}</span>
+                          {option}
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                  {errors.category && <p className="field-error" id="category-error">{errors.category}</p>}
                 </div>
 
-                <fieldset className="form-section platform-section" aria-describedby="platform-description">
-                  <legend className="field-label">플랫폼</legend>
-                  <p className="field-description" id="platform-description">크리에이터가 활동하는 플랫폼을 선택해 주세요.</p>
-                  <div className="platform-options">
-                    {platforms.map((option) => (
-                      <label key={option} className={`platform-option ${platform === option ? "is-selected" : ""}`}>
-                        <input
-                          type="radio" name="platform" value={option} checked={platform === option}
-                          onChange={() => { setPlatform(option); setConfirmed(false); }}
-                        />
-                        <span>{option}</span>
-                      </label>
-                    ))}
+                <div className="form-row">
+                  <div className="row-label"><span className="field-label" id="size-label">팔로워 규모 <span aria-hidden="true">*</span></span></div>
+                  <div className="row-content">
+                    <div className="size-options" role="radiogroup" aria-labelledby="size-label" aria-required="true" aria-invalid={Boolean(errors.size)} aria-describedby={errors.size ? "size-error" : undefined}>
+                      {sizes.map((option) => (
+                        <div className="size-choice" key={option.id}>
+                          <label className={`choice-button ${size === option.id ? "is-selected" : ""} ${errors.size ? "has-error" : ""}`}>
+                            <input type="radio" id={`size-${option.id}`} name="follower-size" value={option.id} checked={size === option.id} required
+                              aria-describedby={`range-${option.id}`}
+                              onChange={() => { setSize(option.id); setConfirmed(false); setErrors((previous) => ({ ...previous, size: undefined })); }} />
+                            <span className="choice-check" aria-hidden="true">{size === option.id && <Check size={16} strokeWidth={2.5} />}</span>
+                            {option.name}
+                          </label>
+                          <span className="size-range" id={`range-${option.id}`}>{option.range}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {errors.size && <p className="field-error" id="size-error">{errors.size}</p>}
                   </div>
-                </fieldset>
-
-                <fieldset className={`form-section follower-section ${errors.size ? "follower-error" : ""}`} aria-describedby={`size-description${errors.size ? " size-error" : ""}`}>
-                  <legend className="field-label">팔로워 규모 <span>*</span></legend>
-                  <p className="field-description" id="size-description">함께하고 싶은 크리에이터의 규모를 선택해 주세요.</p>
-                  <div className="size-options">
-                    {sizes.map((option) => (
-                      <label key={option.id} className={`size-option ${size === option.id ? "is-selected" : ""}`}>
-                        <input type="radio" id={`size-${option.id}`} name="follower-size" value={option.id} checked={size === option.id}
-                          aria-required="true" aria-invalid={Boolean(errors.size)}
-                          onChange={() => { setSize(option.id); setConfirmed(false); setErrors((previous) => ({ ...previous, size: undefined })); }} />
-                        <div className="size-card-top"><span className="scale-bars" aria-hidden="true">{[1, 2, 3].map((bar) => <i key={bar} className={bar <= option.bars ? "filled" : ""} />)}</span><span className="radio-indicator" aria-hidden="true">{size === option.id && <Check size={11} strokeWidth={3} />}</span></div>
-                        <strong>{option.name}</strong><span className="size-range">{option.range}</span>
-                      </label>
-                    ))}
-                  </div>
-                  <p className="size-note"><Info size={14} />구독자 수를 포함한 팔로워 수 기준이에요.</p>
-                  {errors.size && <p className="field-error" id="size-error">{errors.size}</p>}
-                </fieldset>
+                </div>
               </div>
 
               <div className="form-actions">
-                <button className="reset-button" type="button" onClick={resetForm}><RotateCcw size={15} />초기화</button>
-                <button className="primary-button" type="submit">조건 확인하기<ArrowRight size={18} /></button>
+                <span className="required-caption"><span aria-hidden="true">*</span> 필수 입력</span>
+                <button className="primary-button" type="submit">조건 확인하기<ArrowRight size={18} aria-hidden="true" /></button>
               </div>
-              {confirmed && <div className="confirmation" role="status"><CircleCheck size={19} /><div><strong>캠페인 조건이 준비됐어요.</strong><p>예산과 카테고리, 플랫폼({platform}), 팔로워 규모를 확인했어요.</p></div><button type="button" aria-label="확인 메시지 닫기" onClick={() => setConfirmed(false)}><X size={16} /></button></div>}
+              {confirmed && <div className="confirmation" role="status"><CircleCheck size={20} aria-hidden="true" /><div><strong>캠페인 조건이 준비됐어요.</strong><p>예산과 카테고리, 플랫폼({platform}), 팔로워 규모를 확인했어요.</p></div><button type="button" aria-label="확인 메시지 닫기" onClick={() => setConfirmed(false)}><X size={18} /></button></div>}
             </form>
           </section>
 
