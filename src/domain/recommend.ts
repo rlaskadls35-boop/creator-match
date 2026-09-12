@@ -192,10 +192,19 @@ export function filterNewCandidates<T extends Creator>(all: T[], input: SearchIn
   return all.filter((c) => !c.hasHistory && matchesPlatform(c, input.platform) && input.categories.includes(c.category) && c.tier === input.tier);
 }
 
-export type NewCandidateSortKey = 'engagement' | 'views';
-export function sortNewCandidates<T extends Creator>(all: T[], key: NewCandidateSortKey): T[] {
+export type NewCandidateSortKey = 'engagement' | 'views' | 'followers';
+export interface NewCandidateSortState {
+  key: NewCandidateSortKey;
+  direction: SortDirection;
+}
+export const DEFAULT_NEW_SORT: NewCandidateSortState = { key: 'engagement', direction: 'desc' };
+
+export function sortNewCandidates<T extends Creator>(all: T[], { key, direction }: NewCandidateSortState): T[] {
+  const sign = direction === 'asc' ? 1 : -1;
   return [...all].sort((a, b) => {
-    const primary = key === 'views' ? b.avgViewCount - a.avgViewCount : b.engagementRate - a.engagementRate;
-    return primary || b.avgViewCount - a.avgViewCount || b.engagementRate - a.engagementRate || a.id.localeCompare(b.id);
+    const primary = key === 'followers' ? a.followers - b.followers
+      : key === 'views' ? a.avgViewCount - b.avgViewCount
+        : a.engagementRate - b.engagementRate;
+    return primary * sign || b.avgViewCount - a.avgViewCount || b.engagementRate - a.engagementRate || a.id.localeCompare(b.id);
   });
 }

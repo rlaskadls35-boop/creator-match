@@ -286,7 +286,6 @@ html, body { overflow-x: hidden; }
   .table > thead > tr > th { font-size: 11px; padding: 12px 4px; overflow-wrap: anywhere; }
   .table > tbody > tr:not(.explain-row) > td { padding: 13px 4px; white-space: normal; overflow-wrap: anywhere; }
   .table .expand-btn--text { padding: 8px 4px; font-size: 12px; white-space: normal; word-break: keep-all; }
-  .table .new-candidates__reference { white-space: normal; }
 }
 @media (max-width: 1100px) {
   .panel__rows > .field { grid-template-columns: 180px minmax(0, 1fr); gap: 20px; }
@@ -374,12 +373,8 @@ html, body { overflow-x: hidden; }
 /* 이력이 있는 후보와 신규 후보를 분리한 로컬 비교 화면 */
 .weights__scope, .results__context { color: var(--text-muted); font-size: 13px; line-height: 1.6; margin: 8px 0 16px; }
 .new-candidates { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border); }
-.new-candidates__head { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; }
-.new-candidates__eyebrow { display: block; color: var(--primary-deep); font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.new-candidates .table-wrap { min-height: 0; }
 .new-candidates__desc { color: var(--text-muted); font-size: 13px; line-height: 1.7; margin: 10px 0 16px; }
-.new-candidates__sort { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
-.new-candidates__unknown { color: var(--text-muted); font-weight: 500; }
-.new-candidates__reference { display: block; margin-top: 5px; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
 @media (max-width: 767px) {
-  .table--new { min-width: 900px; }
+  .table--new { min-width: 640px; }
 }

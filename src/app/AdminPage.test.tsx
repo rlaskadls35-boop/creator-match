@@ -122,7 +122,7 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     await openWeights(user);
     expect(screen.getAllByRole('spinbutton')).toHaveLength(4);
     expect(screen.queryByLabelText('캠페인 건수 비중 (%)')).not.toBeInTheDocument();
-    const fresh = screen.getByRole('table', { name: '추가 확인이 필요한 신규 후보' });
+    const fresh = screen.getByRole('table', { name: '캠페인 이력이 없는 후보' });
     const before = fresh.textContent;
     await user.click(screen.getByRole('button', { name: '하은챌린지104 계산 내역 보기' }));
     const panel = screen.getByLabelText('하은챌린지104 매칭 점수 계산 내역');
