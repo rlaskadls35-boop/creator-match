@@ -1,3 +1,4 @@
+import { databaseBytes } from '../test/sqliteFixture';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -5,7 +6,7 @@ import { AdminPage } from './AdminPage';
 import { loadDataset } from './dataset';
 import { SESSION_KEY } from './session';
 
-const data = loadDataset();
+const data = await loadDataset(databaseBytes);
 
 /** 제안서와 같은 조건: 1명당 50만 원 · 뷰티 · 나노 → 이력 후보 2명 */
 async function searchThree(user: ReturnType<typeof userEvent.setup>) {
