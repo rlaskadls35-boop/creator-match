@@ -15,7 +15,7 @@ describe('filterCandidates (설계 §5.1)', () => {
     const c = filterCandidates(ranked, Q);
     expect(c).toHaveLength(6);
     expect(c[0].id).toBe('C0077');
-    expect(c[0].matchScore).toBeCloseTo(72.839, 3);
+    expect(c[0].matchScore).toBeCloseTo(75.61, 2); // 25.4×30% + 95.8×20% + 95.1×10% + 98.3×40%
   });
   it('예산 경계: 단가 == 예산은 포함 (민석스토리37, 테크·마이크로 1,500,000)', () => {
     const at = filterCandidates(ranked, { ...Q, budget: 1_500_000, categories: ['테크'] });

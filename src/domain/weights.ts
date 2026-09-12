@@ -3,8 +3,8 @@ import type { MetricKey, Weights } from './types';
 
 export const WEIGHTS_STORAGE_KEY = 'creator-match.weights';
 
-/** 기존 30:25:20:15 비율을 합계 100으로 환산한 임시값. 최적 비중을 의미하지 않는다 */
-export const DEFAULT_WEIGHTS: Weights = { engagement: 33, views: 28, rating: 22, costPerView: 17 };
+/** 사용자가 반복 테스트 후 확정한 기본 비중: 참여율 30%, 조회수 20%, 평점 10%, 비용 40% */
+export const DEFAULT_WEIGHTS: Weights = { engagement: 30, views: 20, rating: 10, costPerView: 40 };
 
 export const METRIC_LABEL: Record<MetricKey, string> = {
   engagement: '참여율',

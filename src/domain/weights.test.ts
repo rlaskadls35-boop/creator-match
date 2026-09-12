@@ -8,8 +8,8 @@ import {
 describe('weights (설계 §5.5, §6.4)', () => {
   beforeEach(() => localStorage.clear());
 
-  it('기본 비중은 기존 비율을 유지한 33/28/22/17, 합 100', () => {
-    expect(DEFAULT_WEIGHTS).toEqual({ engagement: 33, views: 28, rating: 22, costPerView: 17 });
+  it('확정 기본 비중은 참여율 30, 조회수 20, 평점 10, 비용 40, 합 100', () => {
+    expect(DEFAULT_WEIGHTS).toEqual({ engagement: 30, views: 20, rating: 10, costPerView: 40 });
     expect(sumWeights(DEFAULT_WEIGHTS)).toBe(100);
     expect(validateWeights(DEFAULT_WEIGHTS)).toBe(true);
   });
@@ -29,7 +29,7 @@ describe('weights (설계 §5.5, §6.4)', () => {
     expect(weightsSumIs100(draftToWeights(draft)!)).toBe(true);
     expect(draftEquals(draft, DEFAULT_WEIGHTS)).toBe(true);
 
-    const over = { ...draft, engagement: 43 }; // 합 110
+    const over = { ...draft, engagement: 40 }; // 합 110
     expect(draftSum(over)).toBe(110);
     expect(draftToWeights(over)).toBeNull();
     expect(draftEquals(over, DEFAULT_WEIGHTS)).toBe(false);
@@ -37,7 +37,7 @@ describe('weights (설계 §5.5, §6.4)', () => {
 
   it('빈 칸은 0으로 세지만 유효하지 않다', () => {
     const empty = { ...toDraft(DEFAULT_WEIGHTS), views: null };
-    expect(draftSum(empty)).toBe(72);
+    expect(draftSum(empty)).toBe(80);
     expect(draftInRange(empty)).toBe(false);
     expect(draftToWeights(empty)).toBeNull();
   });

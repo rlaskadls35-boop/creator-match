@@ -29,7 +29,7 @@ describe('광고주 화면 스모크 (설계 §8)', () => {
     expect(screen.getByText('캠페인 이력이 있는 후보 6명')).toBeInTheDocument();
     const rows = screen.getAllByRole('row');
     expect(rows[1]).toHaveTextContent('정은매거진77');
-    expect(rows[1].querySelector('[data-label="매칭 점수"]')).toHaveTextContent('73'); // 72.839 → 73
+    expect(rows[1].querySelector('[data-label="매칭 점수"]')).toHaveTextContent('76'); // 75.61 → 76
 
     await user.click(screen.getByRole('button', { name: '정은매거진77 추천 이유 보기' }));
     expect(screen.getByText('왜 추천하나요?')).toBeInTheDocument();

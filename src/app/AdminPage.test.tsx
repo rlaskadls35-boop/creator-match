@@ -16,8 +16,8 @@ async function searchThree(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: '크리에이터 찾기' }));
   expect(await screen.findByText('캠페인 이력이 있는 후보 2명')).toBeInTheDocument();
   const firstRow = within(screen.getByRole('table', { name: '캠페인 이력이 있는 후보' })).getAllByRole('row')[1];
-  expect(firstRow).toHaveTextContent('하은챌린지104');
-  expect(firstRow.querySelector('[data-label="매칭 점수"]')).toHaveTextContent('39'); // 새 나노 집단에서 38.59점
+  expect(firstRow).toHaveTextContent('하은리뷰121');
+  expect(firstRow.querySelector('[data-label="매칭 점수"]')).toHaveTextContent('46'); // 확정 기본 비중에서 45.62점
 }
 
 async function openWeights(user: ReturnType<typeof userEvent.setup>) {
@@ -68,17 +68,17 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     // 참여율 30 → 40 (합계 110)
     const engagement = screen.getByLabelText('참여율 비중 (%)');
     await user.clear(engagement);
-    await user.type(engagement, '43');
+    await user.type(engagement, '40');
 
     expect(screen.getByText('합계 110% / 100%')).toBeInTheDocument();
     expect(screen.getByText('10% 초과 · 비중을 낮춰 100%를 맞추세요.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '비중 저장' })).toBeDisabled();
     expect(screen.getAllByRole('row')[1].textContent).toBe(before); // 결과는 그대로
 
-    // 평균 조회수 25 → 15 (합계 100)
+    // 평균 조회수 20 → 10 (합계 100)
     const views = screen.getByLabelText('평균 조회수 비중 (%)');
     await user.clear(views);
-    await user.type(views, '18');
+    await user.type(views, '10');
 
     expect(screen.getByText('합계 100% / 100%')).toBeInTheDocument();
     expect(screen.getByText('저장하지 않은 변경')).toBeInTheDocument();
@@ -103,13 +103,13 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     const engagement = screen.getByLabelText('참여율 비중 (%)');
     await user.clear(engagement);
     await user.type(engagement, '10');
-    const campaigns = screen.getByLabelText('광고주 평점 비중 (%)');
-    await user.clear(campaigns);
-    await user.type(campaigns, '45');
+    const rating = screen.getByLabelText('광고주 평점 비중 (%)');
+    await user.clear(rating);
+    await user.type(rating, '30');
     expect(screen.getAllByRole('row')[1].textContent).not.toBe(before);
 
     await user.click(screen.getByRole('button', { name: '변경 취소' }));
-    expect(engagement).toHaveValue(33);
+    expect(engagement).toHaveValue(30);
     expect(screen.getAllByRole('row')[1].textContent).toBe(before);
     expect(screen.getByRole('button', { name: '변경 취소' })).toBeDisabled();
   });
@@ -131,10 +131,10 @@ describe('운영자 비중 화면 (개선안 L23)', () => {
     expect(within(panel).getByText(/캠페인 집행건수는 협업 경험을 참고하는 정보/)).toBeInTheDocument();
     const engagement = screen.getByLabelText('참여율 비중 (%)');
     await user.clear(engagement);
-    await user.type(engagement, '43');
+    await user.type(engagement, '40');
     const views = screen.getByLabelText('평균 조회수 비중 (%)');
     await user.clear(views);
-    await user.type(views, '18');
+    await user.type(views, '10');
     expect(fresh.textContent).toBe(before);
   });
 });

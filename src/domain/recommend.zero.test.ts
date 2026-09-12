@@ -14,12 +14,12 @@ describe('후보 0명: 근접 후보만 보여 준다 (L25)', () => {
     expect(filterCandidates(ranked, Q)).toHaveLength(0);
   });
 
-  it('근접 후보 3명: 준그램40(예산), 민준다이어리20(예산), 하은챌린지104(규모)', () => {
+  it('근접 후보 3명: 준그램40(예산), 하은리뷰121(규모), 하은챌린지104(규모)', () => {
     const near = nearCandidates(ranked, Q);
     expect(near).toHaveLength(3);
-    expect(near.map((n) => n.creator.id)).toEqual(['C0040', 'C0020', 'C0104']);
+    expect(near.map((n) => n.creator.id)).toEqual(['C0040', 'C0121', 'C0104']);
     expect(near[0].change).toBe('예산을 658만 원 이상으로');
-    expect(near[1].change).toBe('예산을 301만 원 이상으로');
+    expect(near[1].change).toBe('규모를 나노로');
     expect(near[2].change).toBe('규모를 나노로');
   });
 
@@ -40,7 +40,7 @@ describe('후보 0명: 근접 후보만 보여 준다 (L25)', () => {
     ];
     const small = rankCreators(scoreCreators(parseCreators(HEADER + '\n' + rows.join('\n') + '\n').creators), DEFAULT_WEIGHTS);
     const near = nearCandidates(small, { platform: 'all', budget: 5_000_000, categories: ['뷰티'], tier: '매크로' });
-    expect(near.map((n) => n.change)).toEqual(['카테고리에 게임 추가', '규모를 나노로', '규모를 마이크로로']); // 매칭 점수 65 / 45 / 40 순
+    expect(near.map((n) => n.change)).toEqual(['카테고리에 게임 추가', '규모를 나노로', '규모를 마이크로로']); // 매칭 점수 55 / 50 / 45 순
   });
 });
 
