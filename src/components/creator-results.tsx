@@ -12,11 +12,11 @@ export default function CreatorResults({ creators, unknownBudgetCount }: { creat
         <p>평균 진행 예산은 과거 캠페인 기준이며, 현재 확정 견적은 아닙니다.</p>
       </div>
       {creators.length > 0 ? (
-        <div className="table-scroll" role="region" aria-label="조건에 맞는 크리에이터 목록" tabIndex={0}>
-          <table className="creator-table">
+        <div className="table-container">
+          <table className="creator-table" role="table">
             <caption className="visually-hidden">선택한 캠페인 조건에 맞는 크리에이터 {creators.length}명</caption>
             <colgroup>
-              {[16, 9, 10, 14, 11, 11, 8, 11, 10].map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}
+              {[15, 10, 10, 14, 11, 11, 7, 12, 10].map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}
             </colgroup>
             <thead>
               <tr>
@@ -31,18 +31,18 @@ export default function CreatorResults({ creators, unknownBudgetCount }: { creat
                 <th scope="col" className="numeric-cell">광고주 평점</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody role="rowgroup">
               {creators.map((creator) => (
-                <tr key={creator.id}>
-                  <th scope="row">{creator.name}</th>
-                  <td>{creator.platform}</td>
-                  <td>{creator.category}</td>
-                  <td className="numeric-cell budget-cell">{creator.avgCampaignBudgetKrw === null ? "예산 확인 필요" : formatNumber(creator.avgCampaignBudgetKrw, "원")}</td>
-                  <td className="numeric-cell">{formatNumber(creator.followers, "명")}</td>
-                  <td className="numeric-cell">{formatNumber(creator.avgViewCount, "회")}</td>
-                  <td className="numeric-cell">{formatNumber(creator.engagementRate, "%")}</td>
-                  <td className="numeric-cell">{formatNumber(creator.totalCampaignCount, "건")}</td>
-                  <td className="numeric-cell">{creator.advertiserRating === null ? <span className="unrated">평가 없음</span> : `${creator.advertiserRating.toFixed(1)} / 5`}</td>
+                <tr key={creator.id} role="row">
+                  <th scope="row" role="rowheader">{creator.name}</th>
+                  <td role="cell" data-label="플랫폼">{creator.platform}</td>
+                  <td role="cell" data-label="카테고리">{creator.category}</td>
+                  <td role="cell" data-label="평균 진행 예산" className="numeric-cell budget-cell">{creator.avgCampaignBudgetKrw === null ? "예산 확인 필요" : formatNumber(creator.avgCampaignBudgetKrw, "원")}</td>
+                  <td role="cell" data-label="팔로워 수" className="numeric-cell">{formatNumber(creator.followers, "명")}</td>
+                  <td role="cell" data-label="평균 조회수" className="numeric-cell">{formatNumber(creator.avgViewCount, "회")}</td>
+                  <td role="cell" data-label="참여율" className="numeric-cell">{formatNumber(creator.engagementRate, "%")}</td>
+                  <td role="cell" data-label="누적 캠페인 건수" className="numeric-cell">{formatNumber(creator.totalCampaignCount, "건")}</td>
+                  <td role="cell" data-label="광고주 평점" className="numeric-cell">{creator.advertiserRating === null ? <span className="unrated">평가 없음</span> : `${creator.advertiserRating.toFixed(1)} / 5`}</td>
                 </tr>
               ))}
             </tbody>

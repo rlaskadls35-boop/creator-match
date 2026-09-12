@@ -159,6 +159,24 @@ export default function CampaignMatcher() {
                 </div>
 
                 <div className="form-row">
+                  <div className="row-label"><span className="field-label" id="platform-label">플랫폼</span></div>
+                  <div className="row-content">
+                    <div className="platform-options" role="radiogroup" aria-labelledby="platform-label">
+                      {platforms.map((option) => (
+                        <label key={option} className={`choice-button ${platform === option ? "is-selected" : ""}`}>
+                          <input
+                            type="radio" name="platform" value={option} checked={platform === option}
+                            onChange={() => { setPlatform(option); clearResults(); }}
+                          />
+                          <span className="choice-check" aria-hidden="true">{platform === option && <Check size={16} strokeWidth={2.5} />}</span>
+                          {option}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-row form-row-wide">
                   <div className="row-label">
                     <span className="field-label" id="category-label">카테고리 <span aria-hidden="true">*</span></span>
                     <span className="field-note" id="category-note">여러 개 선택</span>
@@ -181,49 +199,32 @@ export default function CampaignMatcher() {
                   </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="row-label"><span className="field-label" id="platform-label">플랫폼</span></div>
-                  <div className="row-content">
-                    <div className="platform-options" role="radiogroup" aria-labelledby="platform-label">
-                      {platforms.map((option) => (
-                        <label key={option} className={`choice-button ${platform === option ? "is-selected" : ""}`}>
-                          <input
-                            type="radio" name="platform" value={option} checked={platform === option}
-                            onChange={() => { setPlatform(option); clearResults(); }}
-                          />
-                          <span className="choice-check" aria-hidden="true">{platform === option && <Check size={16} strokeWidth={2.5} />}</span>
-                          {option}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="form-row">
+                <div className="form-row form-row-wide">
                   <div className="row-label"><span className="field-label" id="size-label">팔로워 규모 <span aria-hidden="true">*</span></span></div>
-                  <div className="row-content">
-                    <div className="size-options" role="radiogroup" aria-labelledby="size-label" aria-required="true" aria-invalid={Boolean(errors.size)} aria-describedby={errors.size ? "size-error" : undefined}>
-                      {sizes.map((option) => (
-                        <div className="size-choice" key={option.id}>
-                          <label className={`choice-button ${size === option.id ? "is-selected" : ""} ${errors.size ? "has-error" : ""}`}>
-                            <input type="radio" id={`size-${option.id}`} name="follower-size" value={option.id} checked={size === option.id} required
-                              aria-describedby={`range-${option.id}`}
-                              onChange={() => { setSize(option.id); clearResults(); setErrors((previous) => ({ ...previous, size: undefined })); }} />
-                            <span className="choice-check" aria-hidden="true">{size === option.id && <Check size={16} strokeWidth={2.5} />}</span>
-                            {option.name}
-                          </label>
-                          <span className="size-range" id={`range-${option.id}`}>{option.range}</span>
-                        </div>
-                      ))}
+                  <div className="row-content follower-controls">
+                    <div className="follower-selection">
+                      <div className="size-options" role="radiogroup" aria-labelledby="size-label" aria-required="true" aria-invalid={Boolean(errors.size)} aria-describedby={errors.size ? "size-error" : undefined}>
+                        {sizes.map((option) => (
+                          <div className="size-choice" key={option.id}>
+                            <label className={`choice-button ${size === option.id ? "is-selected" : ""} ${errors.size ? "has-error" : ""}`}>
+                              <input type="radio" id={`size-${option.id}`} name="follower-size" value={option.id} checked={size === option.id} required
+                                aria-describedby={`range-${option.id}`}
+                                onChange={() => { setSize(option.id); clearResults(); setErrors((previous) => ({ ...previous, size: undefined })); }} />
+                              <span className="choice-check" aria-hidden="true">{size === option.id && <Check size={16} strokeWidth={2.5} />}</span>
+                              {option.name}
+                            </label>
+                            <span className="size-range" id={`range-${option.id}`}>{option.range}</span>
+                          </div>
+                        ))}
+                      </div>
+                      {errors.size && <p className="field-error" id="size-error">{errors.size}</p>}
                     </div>
-                    {errors.size && <p className="field-error" id="size-error">{errors.size}</p>}
+                    <div className="form-actions">
+                      <button className="primary-button" type="submit" disabled={isLoading} aria-busy={isLoading}>{isLoading ? "조회 중…" : "조건 확인하기"}<ArrowRight size={18} aria-hidden="true" /></button>
+                      <span className="required-caption"><span aria-hidden="true">*</span> 필수 입력</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="form-actions">
-                <span className="required-caption"><span aria-hidden="true">*</span> 필수 입력</span>
-                <button className="primary-button" type="submit" disabled={isLoading} aria-busy={isLoading}>{isLoading ? "조회 중…" : "조건 확인하기"}<ArrowRight size={18} aria-hidden="true" /></button>
               </div>
             </form>
           </section>
